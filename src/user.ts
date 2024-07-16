@@ -1,0 +1,9 @@
+export interface User {
+    gitHub_handle: string;
+    name: string | null;
+    company?: string | null;
+    location?: string | null;
+    email?: string | null;
+    bio?: string| null;
+    twitter_handle?: string| null
+  }

@@ -2,7 +2,8 @@ import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
-import { getUserInfo } from "./userHandler";
+import { getUserInfo, storeUserInfo } from "./userHandler";
+import { User } from "./user";
 
 type EnvVars = {
   DATABASE_URL: string;
@@ -19,9 +20,10 @@ app.get("/", (c) => {
 
 app.get("/user", async (c) => {
   try {
-    const info = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
-    console.log(info);
-    return c.json(info);
+    const userInfo = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
+    const user = userInfo.user
+    storeUserInfo(user, c.env.DATABASE_URL);
+    return c.json(user);
   } catch (error) {
     console.error("Error fetching user info:", error);
     return c.json({ error: "Failed to fetch user info" }, 500);

@@ -1,8 +1,8 @@
 {
   "name": "hono-github-tracker",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts",
+    "dev": "wrangler dev src/index.tsx",
+    "deploy": "wrangler deploy --minify src/index.tsx",
     "studio": "bunx @fiberplane/studio@beta",
     "lint": "biome lint",
     "format": "biome format --write",
