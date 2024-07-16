@@ -1,7 +1,14 @@
 import { relations } from "drizzle-orm";
-import { pgEnum, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
-export const users = pgTable("users_table", {
+export const users = pgTable("users", {
   id: serial("id").primaryKey(),
 
   // Required fields
@@ -17,16 +24,16 @@ export const users = pgTable("users_table", {
   twitterHandle: text("twitter_handle"),
 });
 
-const interactionEnum = pgEnum("interaction", [
-  "star",
+export const interactionEnum = pgEnum("interaction", [
   "fork",
   "issue",
   "pull_request",
+  "star",
 ]);
 
-export const interactions = pgTable("engagements_table", {
+export const interactions = pgTable("interactions", {
   id: serial("id").primaryKey(),
-  userId: text("user_id")
+  userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   githubRepo: text("github_repo").notNull(),
