@@ -4,7 +4,12 @@ import { Hono } from "hono";
 import { getDb } from "../db";
 import { getUserInfo } from "./userHandler";
 
-const app = new Hono<{ Bindings: { DATABASE_URL: string } }>();
+type EnvVars = {
+  DATABASE_URL: string;
+  GITHUB_TOKEN: string;
+};
+
+const app = new Hono<{ Bindings: EnvVars }>();
 
 app.use(createHonoMiddleware(app));
 
@@ -14,7 +19,7 @@ app.get("/", (c) => {
 
 app.get("/user", async (c) => {
   try {
-    const info = await getUserInfo("evanshortiss");
+    const info = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
     console.log(info);
     return c.json(info);
   } catch (error) {

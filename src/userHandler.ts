@@ -1,11 +1,17 @@
 import { Octokit } from "@octokit/core";
-import * as dotenv from "dotenv";
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
-});
+let octokit: Octokit;
+function getOctokit(githubToken: string) {
+  if (!octokit) {
+    octokit = new Octokit({ auth: githubToken });
+  }
 
-export const getUserInfo = async (userName: string) => {
+  return octokit;
+}
+
+export const getUserInfo = async (userName: string, githubToken: string) => {
+  const octokit = getOctokit(githubToken);
+
   try {
     const userinfo = await octokit.request("GET /users/{username}", {
       username: userName,
