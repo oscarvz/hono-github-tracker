@@ -12,11 +12,12 @@
     "@neondatabase/serverless": "^0.9.4",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
-    "hono": "^4.4.13"
+    "hono": "^4.4.13",
+    "octokit": "^4.0.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "@cloudflare/workers-types": "^4.20240529.0",
+    "@cloudflare/workers-types": "^4.20240712.0",
     "@fiberplane/hono": "^0.2.0",
     "drizzle-kit": "^0.23.0",
     "typescript": "^5.5.3",
