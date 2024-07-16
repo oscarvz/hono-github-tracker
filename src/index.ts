@@ -1,9 +1,12 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import { createHonoMiddleware } from "@fiberplane/hono";
 
-const app = new Hono()
+const app = new Hono();
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+app.use(createHonoMiddleware(app));
 
-export default app
+app.get("/", (c) => {
+	return c.text("Hello Hono!");
+});
+
+export default app;

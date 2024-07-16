@@ -2,13 +2,24 @@
   "name": "hono-github-tracker",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "studio": "bunx @fiberplane/studio@beta",
+    "lint": "biome lint",
+    "format": "biome format --write",
+    "type-check": "tsc"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.32.0",
     "hono": "^4.4.13"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@cloudflare/workers-types": "^4.20240529.0",
+    "@fiberplane/hono": "^0.2.0",
+    "drizzle-kit": "^0.23.0",
+    "typescript": "^5.5.3",
     "wrangler": "^3.57.2"
   }
 }

@@ -6,6 +6,7 @@ dist/
 !.yarn/releases
 .vscode/*
 !.vscode/launch.json
+!.vscode/extensions.json
 !.vscode/*.code-snippets
 .idea/workspace.xml
 .idea/usage.statistics.xml
@@ -31,3 +32,6 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# FPX Studio
+.fpxconfig
