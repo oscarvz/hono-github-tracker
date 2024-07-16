@@ -6,7 +6,7 @@ const app = new Hono();
 app.use(createHonoMiddleware(app));
 
 app.get("/", (c) => {
-	return c.text("Hello Hono!");
+  return c.text("Hello Hono!");
 });
 
 export default app;
