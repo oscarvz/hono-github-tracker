@@ -55,7 +55,6 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
           } else{
             await db.insert(users).values(
                 {
-                    id: 444, // how to be define a new id? 
                     name: user.name ?? "undefined",
                     githubHandle: user.gitHub_handle,
                     company: user.company,
