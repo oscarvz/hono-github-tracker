@@ -27,6 +27,7 @@ export const getUserInfo = async (userName: string, githubToken: string) => {
  
     const user: User = {
         gitHub_handle: userName,
+        gitHub_avatar: userinfo.data.avatar_url,
         name: userinfo.data.name,
         company: userinfo.data.company,
         location: userinfo.data.location,
@@ -56,9 +57,9 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
                 {
                     id: 444, // how to be define a new id? 
                     name: user.name ?? "undefined",
-                    githubHandle: user.gitHub_handle ?? "undefined",
+                    githubHandle: user.gitHub_handle,
                     company: user.company,
-                    githubAvatar: "something", // still needs to be part of the userInterface 
+                    githubAvatar: user.gitHub_avatar,
                     twitterHandle: user.twitter_handle,
                     location: user.location,
                     role: user.bio,
