@@ -3,7 +3,6 @@ import { Hono } from "hono";
 
 import { getDb } from "../db";
 import { getUserInfo, storeUserInfo } from "./userHandler";
-import { User } from "./user";
 
 type EnvVars = {
   DATABASE_URL: string;
@@ -22,7 +21,7 @@ app.get("/", (c) => {
 app.get("/user", async (c) => {
   try {
     const userInfo = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
-    const user = userInfo.user
+    const user = userInfo.user;
     await storeUserInfo(user, c.env.DATABASE_URL);
     return c.json(user);
   } catch (error) {
