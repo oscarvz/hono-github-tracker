@@ -1,4 +1,4 @@
-import { createHonoMiddleware } from "@fiberplane/hono";
+// import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
@@ -11,7 +11,7 @@ type EnvVars = {
 
 const app = new Hono<{ Bindings: EnvVars }>();
 
-app.use(createHonoMiddleware(app));
+// app.use("/api*", createHonoMiddleware(app));
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
@@ -46,5 +46,27 @@ app.get("/users", async (c) => {
 
   return c.html(<h1>No users... yet</h1>);
 });
+
+app.get("/client", (c) =>
+  c.html(
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+        <title>The juicy bits</title>
+
+        {import.meta.env.PROD ? (
+          <script type="module" src="/static/client.js" />
+        ) : (
+          <script type="module" src="/src/client/index.tsx" />
+        )}
+      </head>
+      <body>
+        <div id="root" />
+      </body>
+    </html>,
+  ),
+);
 
 export default app;

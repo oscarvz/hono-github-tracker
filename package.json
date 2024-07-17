@@ -1,8 +1,10 @@
 {
   "name": "hono-github-tracker",
+  "type": "module",
   "scripts": {
-    "dev": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.tsx",
+    "dev": "vite",
+    "build": "vite build --mode client && vite build",
+    "deploy": "$npm_execpath run build && wrangler pages deploy",
     "studio": "bunx @fiberplane/studio@beta",
     "lint": "biome lint",
     "format": "biome format --write",
@@ -13,12 +15,15 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
     "hono": "^4.4.13",
-    "octokit": "^4.0.2"
+    "octokit": "^4.0.2",
+    "vite": "^5.3.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@cloudflare/workers-types": "^4.20240712.0",
     "@fiberplane/hono": "^0.2.0",
+    "@hono/vite-cloudflare-pages": "^0.4.2",
+    "@hono/vite-dev-server": "^0.13.1",
     "drizzle-kit": "^0.23.0",
     "typescript": "^5.5.3",
     "wrangler": "^3.57.2"
