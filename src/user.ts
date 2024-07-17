@@ -1,4 +1,5 @@
 export interface User {
+    gitHub_id: number;
     gitHub_handle: string;
     gitHub_avatar: string;
     name: string | null;

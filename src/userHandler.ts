@@ -14,19 +14,21 @@ function getOctokit(githubToken: string) {
   return octokit;
 }
 
-export const getUserInfo = async (userName: string, githubToken: string) => {
+export const getUserInfo = async (githubId: number, githubToken: string) => {
   const octokit = getOctokit(githubToken);
 
   try {
-    const userinfo = await octokit.request("GET /users/{username}", {
-      username: userName,
+    const userinfo = await octokit.request("GET /user/{githubId}", {
+      githubId: githubId,
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
  
+    console.log(userinfo)
     const user: User = {
-        gitHub_handle: userName,
+        gitHub_id: githubId,
+        gitHub_handle: userinfo.data.login,
         gitHub_avatar: userinfo.data.avatar_url,
         name: userinfo.data.name,
         company: userinfo.data.company,
@@ -48,15 +50,10 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
     const db = getDb(databaseUrl);
 
     try {
-        const dataBaseEntry = await db.select().from(users).where(eq(users.githubHandle, user.gitHub_handle));
-        if (dataBaseEntry.length > 0) {
-            console.log("community member already exist")
-         
-          } else{
-            console.log("new community member spotted")
             await db.insert(users).values(
                 {
-                    name: user.name ?? "undefined",
+                    githubUserId: user.gitHub_id,
+                    name: user.name ?? "undefineds",
                     githubHandle: user.gitHub_handle,
                     emailAddress : user.email,
                     company: user.company,
@@ -66,10 +63,7 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
                     role: user.bio,
 
                 }
-            )
-          }
-    
-         ;
+            ).onConflictDoNothing(); 
         
       } catch (error) {
         console.error("Database error:", error);
