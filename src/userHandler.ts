@@ -50,13 +50,15 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
     try {
         const dataBaseEntry = await db.select().from(users).where(eq(users.githubHandle, user.gitHub_handle));
         if (dataBaseEntry.length > 0) {
-            // user exist already do nothing?
+            console.log("community member already exist")
          
           } else{
+            console.log("new community member spotted")
             await db.insert(users).values(
                 {
                     name: user.name ?? "undefined",
                     githubHandle: user.gitHub_handle,
+                    emailAddress : user.email,
                     company: user.company,
                     githubAvatar: user.gitHub_avatar,
                     twitterHandle: user.twitter_handle,

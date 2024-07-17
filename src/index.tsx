@@ -18,11 +18,12 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
+// only for testing the UserHandler and the insert into the db
 app.get("/user", async (c) => {
   try {
     const userInfo = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
     const user = userInfo.user
-    storeUserInfo(user, c.env.DATABASE_URL);
+    await storeUserInfo(user, c.env.DATABASE_URL);
     return c.json(user);
   } catch (error) {
     console.error("Error fetching user info:", error);
