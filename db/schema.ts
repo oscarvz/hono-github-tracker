@@ -52,6 +52,6 @@ export const usersInteractions = relations(users, ({ many }) => ({
 export const interactionsUser = relations(interactions, ({ one }) => ({
   user: one(users, {
     fields: [interactions.userId],
-    references: [users.githubUserId],
+    references: [users.id],
   }),
 }));
