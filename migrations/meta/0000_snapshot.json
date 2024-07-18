@@ -1,11 +1,11 @@
 {
-  "id": "6fec1dad-0215-423c-93d2-ef0987a0d0e5",
+  "id": "0730753e-dd14-4619-9bd1-70b800640bc3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.interactions": {
-      "name": "interactions",
+    "public.events": {
+      "name": "events",
       "schema": "",
       "columns": {
         "id": {
@@ -22,16 +22,28 @@
         },
         "github_repo": {
           "name": "github_repo",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "interaction": {
-          "name": "interaction",
-          "type": "interaction",
+        "event_type": {
+          "name": "event_type",
+          "type": "event_type",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -39,19 +51,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "interactions_user_id_users_id_fk": {
-          "name": "interactions_user_id_users_id_fk",
-          "tableFrom": "interactions",
+        "events_user_id_users_id_fk": {
+          "name": "events_user_id_users_id_fk",
+          "tableFrom": "events",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -76,6 +82,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "github_user_id": {
+          "name": "github_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "github_avatar": {
           "name": "github_avatar",
           "type": "text",
@@ -84,12 +96,6 @@
         },
         "github_handle": {
           "name": "github_handle",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -118,6 +124,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "twitter_handle": {
           "name": "twitter_handle",
           "type": "text",
@@ -132,8 +144,8 @@
     }
   },
   "enums": {
-    "public.interaction": {
-      "name": "interaction",
+    "public.event_type": {
+      "name": "event_type",
       "schema": "public",
       "values": [
         "fork",

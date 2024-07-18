@@ -15,7 +15,6 @@ export const users = pgTable("users", {
   githubUserId: integer("github_user_id").notNull(),
   githubAvatar: text("github_avatar").notNull(),
   githubHandle: text("github_handle").notNull(),
-  
 
   // Optional fields
   company: text("company"),
@@ -33,11 +32,11 @@ export const eventTypeEnum = pgEnum("event_type", [
   "star",
 ]);
 
-export const interactions = pgTable("interactions", {
+export const events = pgTable("events", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
-    .references(() => users.githubUserId, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   githubRepo: integer("github_repo").notNull(),
   eventType: eventTypeEnum("event_type").notNull(),
   eventID: integer("event_id"),
@@ -45,13 +44,13 @@ export const interactions = pgTable("interactions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const usersInteractions = relations(users, ({ many }) => ({
-  interactions: many(interactions),
+export const usersEvents = relations(users, ({ many }) => ({
+  interactions: many(events),
 }));
 
-export const interactionsUser = relations(interactions, ({ one }) => ({
+export const eventUser = relations(events, ({ one }) => ({
   user: one(users, {
-    fields: [interactions.userId],
+    fields: [events.userId],
     references: [users.id],
   }),
 }));
