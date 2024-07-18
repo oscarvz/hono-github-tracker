@@ -7,6 +7,8 @@ import { User } from "./user";
 import WEBHOOKS, { Webhooks } from "@octokit/webhooks";
 import SCHEMA from "@octokit/webhooks-schemas";
 import { time } from "drizzle-orm/mysql-core";
+import { handleGitHubEvent } from "./githubEventHandler";
+import { GithubEvent } from "./githubEvent";
 
 
 type EnvVars = {
@@ -55,40 +57,37 @@ app.get("/users", async (c) => {
 app.post("/githubWebhook", async (c)=>{
 
  const header = c.req.header()
- const eventType = header["x-github-event"]
  const body = await c.req.json()
- const action = body.action
- const userName = body.sender.login;
- const userId = body.sender.id;
- const repo_id = body.repository.id
+ 
+ const userGithubId = body.sender.id;
 
- if(eventType === "star") {
+ try {
 
-   if(action == "created"){
-    const timestamp = body.starred_at
-    //const repo_id = body.repository.id
-    
-    console.log("A user starred your repo: ", userName, " at: ", timestamp , repo_id)
-   }
-   if(action == "deleted"){
-     console.log("a user deleted a star: ", userName)
-   }
+  const userInfo = await getUserInfo(userGithubId, c.env.GITHUB_TOKEN);
+  console.log(userInfo)
+  const userId = await storeUserInfo(userInfo.user, c.env.DATABASE_URL)
 
- } else if(eventType === "issues"){
-  const issue_id = body.issue.id;
-  const timestamp = body.issue.created_at
-  
-  console.log("issue has been handeled for repo with id: ", issue_id, "for repo: ", repo_id, "user: ", userName, "with id: ", userId, "at: ", timestamp)
+  const event: GithubEvent={
+    createdBy: userId,
+    type: header["x-github-event"],
+    action: body.action,
+    repo: body.repository.id
+  }
 
- } 
-  
- else{
-   console.log("Event type ", eventType,  " is not supported and handled yet")
+  await handleGitHubEvent(event,body, c.env.DATABASE_URL);
+
+
+
  }
+catch(error){
+  console.error("Error fetching user info:", error);
+  return c.json({ error: "Failed to fetch user info" }, 500);
+}
 
 
+return c.html("Yeah") })
 
-  return c.html("Yeah") });
+
 
 
 // app.post("/githubWebhook", async (c)=>{

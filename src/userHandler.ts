@@ -25,7 +25,7 @@ export const getUserInfo = async (githubId: number, githubToken: string) => {
       },
     });
  
-    console.log(userinfo)
+   // console.log(userinfo)
     const user: User = {
         gitHub_id: githubId,
         gitHub_handle: userinfo.data.login,
@@ -50,10 +50,12 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
     const db = getDb(databaseUrl);
 
     try {
+
+
             await db.insert(users).values(
                 {
                     githubUserId: user.gitHub_id,
-                    name: user.name ?? "undefineds",
+                    name: user.name ?? "undefined",
                     githubHandle: user.gitHub_handle,
                     emailAddress : user.email,
                     company: user.company,
@@ -63,12 +65,19 @@ export const storeUserInfo = async (user: User, databaseUrl: string) => {
                     role: user.bio,
 
                 }
-            ).onConflictDoNothing(); 
+            )
+            //.returning({userId: users.id})
+            .onConflictDoNothing(); 
+
+            const dataBaseEntry = await db.select().from(users).where(eq(users.githubUserId, user.gitHub_id));
+            const id = dataBaseEntry[0].id;
+
+            return id
         
       } catch (error) {
         console.error("Database error:", error);
+        return 123;
       }
-      return null;
 
 
    

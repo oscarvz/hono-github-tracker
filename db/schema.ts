@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
 
   // Required fields
-  githubUserId: integer("github_user_id").notNull(),
+  githubUserId: integer("github_user_id").notNull().unique(),
   githubAvatar: text("github_avatar").notNull(),
   githubHandle: text("github_handle").notNull(),
 
