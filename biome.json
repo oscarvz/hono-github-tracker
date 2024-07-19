@@ -18,6 +18,14 @@
     }
   },
   "files": {
-    "ignore": ["*.d.ts", "node_modules", ".wrangler", ".git", "migrations"]
+    "ignore": [
+      ".git",
+      ".github",
+      ".wrangler",
+      "*.d.ts",
+      "dist",
+      "migrations",
+      "node_modules"
+    ]
   }
 }

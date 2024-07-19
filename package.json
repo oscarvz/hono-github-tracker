@@ -8,6 +8,7 @@
     "studio": "bunx @fiberplane/studio@beta",
     "lint": "biome lint",
     "format": "biome format --write",
+    "ci:format": "biome format",
     "type-check": "tsc"
   },
   "dependencies": {
@@ -27,5 +28,6 @@
     "drizzle-kit": "^0.23.0",
     "typescript": "^5.5.3",
     "wrangler": "^3.57.2"
-  }
+  },
+  "packageManager": "bun@1.1.20"
 }
