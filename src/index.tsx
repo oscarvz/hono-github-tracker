@@ -2,6 +2,8 @@ import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
+import type { GithubEvent } from "./githubEvent";
+import { handleGitHubEvent } from "./githubEventHandler";
 import { getUserInfo, storeUserInfo } from "./userHandler";
 
 type EnvVars = {
@@ -20,7 +22,7 @@ app.get("/", (c) => {
 // only for testing the UserHandler and the insert into the db
 app.get("/user", async (c) => {
   try {
-    const userInfo = await getUserInfo("evanshortiss", c.env.GITHUB_TOKEN);
+    const userInfo = await getUserInfo(36015705, c.env.GITHUB_TOKEN);
     const user = userInfo.user;
     await storeUserInfo(user, c.env.DATABASE_URL);
     return c.json(user);
@@ -46,5 +48,53 @@ app.get("/users", async (c) => {
 
   return c.html(<h1>No users... yet</h1>);
 });
+
+app.post("/githubWebhook", async (c) => {
+  const header = c.req.header();
+  const body = await c.req.json();
+
+  const userGithubId = body.sender.id;
+
+  try {
+    const userInfo = await getUserInfo(userGithubId, c.env.GITHUB_TOKEN);
+    console.log(userInfo);
+    const userId = await storeUserInfo(userInfo.user, c.env.DATABASE_URL);
+
+    const event: GithubEvent = {
+      createdBy: userId,
+      type: header["x-github-event"],
+      action: body.action,
+      repo: body.repository.id,
+    };
+
+    await handleGitHubEvent(event, body, c.env.DATABASE_URL);
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    return c.json({ error: "Failed to fetch user info" }, 500);
+  }
+
+  return c.html("Yeah");
+});
+
+// app.post("/githubWebhook", async (c)=>{
+
+//  const webhooks = new Webhooks({
+//     secret: "honk-honk-honk"
+
+//   })
+
+//   const body = await c.req.json();
+//   const header = await c.req.header();
+//   const eventType = header["x-github-event"];
+
+//     webhooks
+//       .verifyAndReceive({
+//         id: header["x-request-id"],
+//         name: "hello",
+//         signature: header["x-hub-signature"],
+//         payload: body,
+//       })
+//       .catch(console.error);
+//   })
 
 export default app;
