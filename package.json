@@ -1,31 +1,31 @@
 {
-	"name": "hono-github-tracker",
-	"scripts": {
-		"dev": "wrangler dev src/index.tsx",
-		"deploy": "wrangler deploy --minify src/index.tsx",
-		"studio": "bunx @fiberplane/studio@beta",
-		"lint": "biome lint",
-		"format": "biome format --write",
-		"ci:format": "biome format",
-		"type-check": "tsc"
-	},
-	"dependencies": {
-		"@neondatabase/serverless": "^0.9.4",
-		"@octokit/webhooks": "^13.3.0",
-		"@octokit/webhooks-schemas": "^7.5.1",
-		"dotenv": "^16.4.5",
-		"drizzle-orm": "^0.32.0",
-		"eventsource": "^2.0.2",
-		"hono": "^4.4.13",
-		"octokit": "^4.0.2"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.8.3",
-		"@cloudflare/workers-types": "^4.20240712.0",
-		"@fiberplane/hono": "^0.2.0",
-		"drizzle-kit": "^0.23.0",
-		"typescript": "^5.5.3",
-		"wrangler": "^3.57.2"
-	},
-	"packageManager": "bun@1.1.20"
+  "name": "hono-github-tracker",
+  "scripts": {
+    "dev": "wrangler dev src/index.tsx",
+    "deploy": "wrangler deploy --minify src/index.tsx",
+    "studio": "bunx @fiberplane/studio@beta",
+    "lint": "biome lint",
+    "format": "biome format --write",
+    "ci:format": "biome format",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "@octokit/webhooks": "^13.3.0",
+    "@octokit/webhooks-schemas": "^7.5.1",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.32.0",
+    "eventsource": "^2.0.2",
+    "hono": "^4.4.13",
+    "octokit": "^4.0.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@cloudflare/workers-types": "^4.20240712.0",
+    "@fiberplane/hono": "^0.2.0",
+    "drizzle-kit": "^0.23.0",
+    "typescript": "^5.5.3",
+    "wrangler": "^3.57.2"
+  },
+  "packageManager": "bun@1.1.20"
 }

@@ -10,7 +10,6 @@ import { time } from "drizzle-orm/mysql-core";
 import { handleGitHubEvent } from "./githubEventHandler";
 import { GithubEvent } from "./githubEvent";
 
-
 type EnvVars = {
   DATABASE_URL: string;
   GITHUB_TOKEN: string;
@@ -28,7 +27,7 @@ app.get("/", (c) => {
 app.get("/user", async (c) => {
   try {
     const userInfo = await getUserInfo(36015705, c.env.GITHUB_TOKEN);
-    const user = userInfo.user
+    const user = userInfo.user;
     await storeUserInfo(user, c.env.DATABASE_URL);
     return c.json(user);
   } catch (error) {
@@ -54,55 +53,44 @@ app.get("/users", async (c) => {
   return c.html(<h1>No users... yet</h1>);
 });
 
-app.post("/githubWebhook", async (c)=>{
+app.post("/githubWebhook", async (c) => {
+  const header = c.req.header();
+  const body = await c.req.json();
 
- const header = c.req.header()
- const body = await c.req.json()
- 
- const userGithubId = body.sender.id;
+  const userGithubId = body.sender.id;
 
- try {
+  try {
+    const userInfo = await getUserInfo(userGithubId, c.env.GITHUB_TOKEN);
+    console.log(userInfo);
+    const userId = await storeUserInfo(userInfo.user, c.env.DATABASE_URL);
 
-  const userInfo = await getUserInfo(userGithubId, c.env.GITHUB_TOKEN);
-  console.log(userInfo)
-  const userId = await storeUserInfo(userInfo.user, c.env.DATABASE_URL)
+    const event: GithubEvent = {
+      createdBy: userId,
+      type: header["x-github-event"],
+      action: body.action,
+      repo: body.repository.id,
+    };
 
-  const event: GithubEvent={
-    createdBy: userId,
-    type: header["x-github-event"],
-    action: body.action,
-    repo: body.repository.id
+    await handleGitHubEvent(event, body, c.env.DATABASE_URL);
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    return c.json({ error: "Failed to fetch user info" }, 500);
   }
 
-  await handleGitHubEvent(event,body, c.env.DATABASE_URL);
-
-
-
- }
-catch(error){
-  console.error("Error fetching user info:", error);
-  return c.json({ error: "Failed to fetch user info" }, 500);
-}
-
-
-return c.html("Yeah") })
-
-
-
+  return c.html("Yeah");
+});
 
 // app.post("/githubWebhook", async (c)=>{
 
-
 //  const webhooks = new Webhooks({
 //     secret: "honk-honk-honk"
-  
+
 //   })
 
 //   const body = await c.req.json();
 //   const header = await c.req.header();
 //   const eventType = header["x-github-event"];
 
-  
 //     webhooks
 //       .verifyAndReceive({
 //         id: header["x-request-id"],
@@ -112,10 +100,5 @@ return c.html("Yeah") })
 //       })
 //       .catch(console.error);
 //   })
-
-
-
-
-
 
 export default app;

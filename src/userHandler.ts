@@ -3,8 +3,6 @@ import { User } from "./user";
 import { getDb, users } from "../db";
 import { eq } from "drizzle-orm";
 
-
-
 let octokit: Octokit;
 function getOctokit(githubToken: string) {
   if (!octokit) {
@@ -24,20 +22,20 @@ export const getUserInfo = async (githubId: number, githubToken: string) => {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
- 
-   // console.log(userinfo)
+
+    // console.log(userinfo)
     const user: User = {
-        gitHub_id: githubId,
-        gitHub_handle: userinfo.data.login,
-        gitHub_avatar: userinfo.data.avatar_url,
-        name: userinfo.data.name,
-        company: userinfo.data.company,
-        location: userinfo.data.location,
-        email: userinfo.data.email,
-        bio: userinfo.data.bio,
-        twitter_handle: userinfo.data.twitter_username
-      };
-    return {user}
+      gitHub_id: githubId,
+      gitHub_handle: userinfo.data.login,
+      gitHub_avatar: userinfo.data.avatar_url,
+      name: userinfo.data.name,
+      company: userinfo.data.company,
+      location: userinfo.data.location,
+      email: userinfo.data.email,
+      bio: userinfo.data.bio,
+      twitter_handle: userinfo.data.twitter_username,
+    };
+    return { user };
 
     //return userinfo.data;
   } catch (error) {
@@ -47,42 +45,34 @@ export const getUserInfo = async (githubId: number, githubToken: string) => {
 };
 
 export const storeUserInfo = async (user: User, databaseUrl: string) => {
-    const db = getDb(databaseUrl);
+  const db = getDb(databaseUrl);
 
-    try {
+  try {
+    await db
+      .insert(users)
+      .values({
+        githubUserId: user.gitHub_id,
+        name: user.name ?? "undefined",
+        githubHandle: user.gitHub_handle,
+        emailAddress: user.email,
+        company: user.company,
+        githubAvatar: user.gitHub_avatar,
+        twitterHandle: user.twitter_handle,
+        location: user.location,
+        role: user.bio,
+      })
+      //.returning({userId: users.id})
+      .onConflictDoNothing();
 
+    const dataBaseEntry = await db
+      .select()
+      .from(users)
+      .where(eq(users.githubUserId, user.gitHub_id));
+    const id = dataBaseEntry[0].id;
 
-            await db.insert(users).values(
-                {
-                    githubUserId: user.gitHub_id,
-                    name: user.name ?? "undefined",
-                    githubHandle: user.gitHub_handle,
-                    emailAddress : user.email,
-                    company: user.company,
-                    githubAvatar: user.gitHub_avatar,
-                    twitterHandle: user.twitter_handle,
-                    location: user.location,
-                    role: user.bio,
-
-                }
-            )
-            //.returning({userId: users.id})
-            .onConflictDoNothing(); 
-
-            const dataBaseEntry = await db.select().from(users).where(eq(users.githubUserId, user.gitHub_id));
-            const id = dataBaseEntry[0].id;
-
-            return id
-        
-      } catch (error) {
-        console.error("Database error:", error);
-        return 123;
-      }
-
-
-   
-
-    
-
-
+    return id;
+  } catch (error) {
+    console.error("Database error:", error);
+    return 123;
+  }
 };
