@@ -6,6 +6,7 @@
     "studio": "bunx @fiberplane/studio@beta",
     "lint": "biome lint",
     "format": "biome format --write",
+    "ci:format": "biome format",
     "type-check": "tsc"
   },
   "dependencies": {
