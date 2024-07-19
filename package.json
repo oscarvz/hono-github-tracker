@@ -6,6 +6,8 @@
     "build": "vite build --mode client && vite build",
     "deploy": "$npm_execpath run build && wrangler pages deploy",
     "studio": "bunx @fiberplane/studio@beta",
+    "db:generate": "bun drizzle-kit generate",
+    "db:migrate": "bun drizzle-kit migrate",
     "lint": "biome lint",
     "format": "biome format --write",
     "ci:format": "biome format",
@@ -29,6 +31,7 @@
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.13.1",
     "drizzle-kit": "^0.23.0",
+    "drizzle-zod": "^0.5.1",
     "typescript": "^5.5.3",
     "wrangler": "^3.57.2"
   },

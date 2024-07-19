@@ -7,6 +7,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -15,6 +16,7 @@ export const users = pgTable("users", {
   githubUserId: integer("github_user_id").notNull().unique(),
   githubAvatar: text("github_avatar").notNull(),
   githubHandle: text("github_handle").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 
   // Optional fields
   company: text("company"),
@@ -54,3 +56,13 @@ export const eventUser = relations(events, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const selectUserSchema = createSelectSchema(users);
+export const insertUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+});
+
+export const selectEventsSchema = createSelectSchema(events);
+export const insertEventsSchema = createInsertSchema(events).omit({
+  createdAt: true,
+});
