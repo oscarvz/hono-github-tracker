@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "hono/jsx";
 
-export function Client() {
+export function App() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
