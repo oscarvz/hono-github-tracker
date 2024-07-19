@@ -1,7 +1,8 @@
 import { Octokit } from "@octokit/core";
-import { User } from "./user";
-import { getDb, users } from "../db";
 import { eq } from "drizzle-orm";
+
+import { getDb, users } from "../db";
+import type { User } from "./user";
 
 let octokit: Octokit;
 function getOctokit(githubToken: string) {

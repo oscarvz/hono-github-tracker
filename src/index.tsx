@@ -2,13 +2,9 @@ import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
-import { getUserInfo, storeUserInfo } from "./userHandler";
-import { User } from "./user";
-import WEBHOOKS, { Webhooks } from "@octokit/webhooks";
-import SCHEMA from "@octokit/webhooks-schemas";
-import { time } from "drizzle-orm/mysql-core";
+import type { GithubEvent } from "./githubEvent";
 import { handleGitHubEvent } from "./githubEventHandler";
-import { GithubEvent } from "./githubEvent";
+import { getUserInfo, storeUserInfo } from "./userHandler";
 
 type EnvVars = {
   DATABASE_URL: string;

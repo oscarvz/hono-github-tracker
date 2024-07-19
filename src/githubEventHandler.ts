@@ -1,10 +1,9 @@
-import { time } from "drizzle-orm/mysql-core";
-import { GithubEvent } from "./githubEvent";
+import type { GithubEvent } from "./githubEvent";
 import { events, getDb } from "../db";
 
 export const handleGitHubEvent = async (
   event: GithubEvent,
-  body: JSON,
+  _: JSON,
   databaseUrl: string,
 ) => {
   console.log("The event: ", event);
@@ -13,14 +12,14 @@ export const handleGitHubEvent = async (
   if (event.type === "star") {
     console.log("star");
 
-    if (event.action == "created") {
+    if (event.action === "created") {
       // event.timestamp = body.starred_at
       event.timestamp = new Date();
 
       console.log(event);
       // console.log("A user starred your repo: ", event.repo , " at: ", event.timestamp)
     }
-    if (event.action == "deleted") {
+    if (event.action === "deleted") {
       event.timestamp = new Date();
       console.log(event);
       // console.log("a user deleted a star: ", event.repo)
