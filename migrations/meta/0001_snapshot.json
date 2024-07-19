@@ -1,6 +1,6 @@
 {
-  "id": "0730753e-dd14-4619-9bd1-70b800640bc3",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "c11b4040-4a8a-417a-9aac-cc5f40f11b08",
+  "prevId": "0730753e-dd14-4619-9bd1-70b800640bc3",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -140,7 +140,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "users_github_user_id_unique": {
+          "name": "users_github_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "github_user_id"
+          ]
+        }
+      }
     }
   },
   "enums": {
