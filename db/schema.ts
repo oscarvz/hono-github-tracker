@@ -59,10 +59,12 @@ export const eventUser = relations(events, ({ one }) => ({
 
 export const selectUserSchema = createSelectSchema(users);
 export const insertUserSchema = createInsertSchema(users).omit({
+  // Omit `createdAt` for inserting as it's inserted by default
   createdAt: true,
 });
 
 export const selectEventsSchema = createSelectSchema(events);
 export const insertEventsSchema = createInsertSchema(events).omit({
+  // Omit `createdAt` for inserting as it's inserted by default
   createdAt: true,
 });

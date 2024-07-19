@@ -1,4 +1,5 @@
 import { createHonoMiddleware } from "@fiberplane/hono";
+import { Webhooks } from "@octokit/webhooks";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
@@ -6,17 +7,51 @@ import type { GithubEvent } from "./githubEvent";
 import { handleGitHubEvent } from "./githubEventHandler";
 import { getUserInfo, storeUserInfo } from "./userHandler";
 
+type Variables = {
+  webhooks: Webhooks;
+};
+
 type EnvVars = {
   DATABASE_URL: string;
   GITHUB_TOKEN: string;
+  GITHUB_WEBHOOK_SECRET: string;
 };
 
-const app = new Hono<{ Bindings: EnvVars }>();
+const app = new Hono<{ Bindings: EnvVars; Variables: Variables }>();
 
 app.use(createHonoMiddleware(app));
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
+});
+
+app.use("/ghwh", async (c, next) => {
+  const webhooks = new Webhooks({ secret: c.env.GITHUB_WEBHOOK_SECRET });
+  const payload = await c.req.text();
+
+  // biome-ignore lint/suspicious/noExplicitAny: type not exposed by octokit/webhooks
+  const name = c.req.header("x-github-event") as any;
+  const signature = c.req.header("x-hub-signature-256");
+  const id = c.req.header("x-request-id");
+  if (!id || !name || !signature) {
+    return c.text("Missing headers", 400);
+  }
+
+  try {
+    await webhooks.verifyAndReceive({
+      id,
+      name,
+      signature,
+      payload,
+    });
+
+    c.set("webhooks", webhooks);
+  } catch (error) {
+    // TODO: Handle error return
+    console.error("error in catch", error);
+  }
+
+  await next();
 });
 
 // only for testing the UserHandler and the insert into the db
