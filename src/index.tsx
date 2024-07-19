@@ -1,4 +1,4 @@
-// import { createHonoMiddleware } from "@fiberplane/hono";
+import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
@@ -11,7 +11,7 @@ type EnvVars = {
 
 const app = new Hono<{ Bindings: EnvVars }>();
 
-// app.use("/api*", createHonoMiddleware(app));
+app.use(createHonoMiddleware(app));
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
