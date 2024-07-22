@@ -1,58 +1,26 @@
 import { createHonoMiddleware } from "@fiberplane/hono";
-import { Webhooks } from "@octokit/webhooks";
 import { Hono } from "hono";
 
 import { getDb } from "../db";
-import type { GithubEvent } from "./githubEvent";
 import { handleGitHubEvent } from "./githubEventHandler";
+import { githubWebhooksMiddleware } from "./middleware";
+import type { GithubEvent } from "./types";
+import type { HonoEnv } from "./types";
 import { getUserInfo, storeUserInfo } from "./userHandler";
 
-type Variables = {
-  webhooks: Webhooks;
-};
-
-type EnvVars = {
-  DATABASE_URL: string;
-  GITHUB_TOKEN: string;
-  GITHUB_WEBHOOK_SECRET: string;
-};
-
-const app = new Hono<{ Bindings: EnvVars; Variables: Variables }>();
+const app = new Hono<HonoEnv>();
 
 app.use(createHonoMiddleware(app));
+app.use("/ghwh", githubWebhooksMiddleware);
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
+app.post("/ghwh", async (c) => {
+  const webhooks = c.get("webhooks");
+
+  // TODO: Handle star events
+  webhooks.on("star.created", async () => {});
 });
 
-app.use("/ghwh", async (c, next) => {
-  const webhooks = new Webhooks({ secret: c.env.GITHUB_WEBHOOK_SECRET });
-  const payload = await c.req.text();
-
-  // biome-ignore lint/suspicious/noExplicitAny: type not exposed by octokit/webhooks
-  const name = c.req.header("x-github-event") as any;
-  const signature = c.req.header("x-hub-signature-256");
-  const id = c.req.header("x-request-id");
-  if (!id || !name || !signature) {
-    return c.text("Missing headers", 400);
-  }
-
-  try {
-    await webhooks.verifyAndReceive({
-      id,
-      name,
-      signature,
-      payload,
-    });
-
-    c.set("webhooks", webhooks);
-  } catch (error) {
-    // TODO: Handle error return
-    console.error("error in catch", error);
-  }
-
-  await next();
-});
+app.get("/", (c) => c.text("Hello Hono!"));
 
 // only for testing the UserHandler and the insert into the db
 app.get("/user", async (c) => {
@@ -90,9 +58,7 @@ app.get("/client", (c) =>
       <head>
         <meta charSet="utf-8" />
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-
-        <title>The juicy bits</title>
-
+        <title>Dashboard</title>
         {import.meta.env.PROD ? (
           <script type="module" src="/static/client.js" />
         ) : (
@@ -132,26 +98,5 @@ app.post("/githubWebhook", async (c) => {
 
   return c.html("Yeah");
 });
-
-// app.post("/githubWebhook", async (c)=>{
-
-//  const webhooks = new Webhooks({
-//     secret: "honk-honk-honk"
-
-//   })
-
-//   const body = await c.req.json();
-//   const header = await c.req.header();
-//   const eventType = header["x-github-event"];
-
-//     webhooks
-//       .verifyAndReceive({
-//         id: header["x-request-id"],
-//         name: "hello",
-//         signature: header["x-hub-signature"],
-//         payload: body,
-//       })
-//       .catch(console.error);
-//   })
 
 export default app;
