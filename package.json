@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.4",
+    "@octokit/core": "^6.1.2",
     "@octokit/webhooks": "^13.3.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
     "hono": "^4.4.13",
-    "octokit": "^4.0.2",
     "vite": "^5.3.4"
   },
   "devDependencies": {

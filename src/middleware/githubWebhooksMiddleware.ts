@@ -15,8 +15,10 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
     c.set("webhooks", webhooks);
     await next();
 
-    /* biome-ignore lint/suspicious/noExplicitAny: type not exposed by
-       octokit/webhooks */
+    /*
+      biome-ignore lint/suspicious/noExplicitAny: type not exposed by
+      octokit/webhooks
+    */
     const name = c.req.header("x-github-event") as any;
     const signature = c.req.header("x-hub-signature-256");
     const id = c.req.header("x-request-id");

@@ -5,6 +5,7 @@ import type { Db } from "./db";
 type Variables = {
   webhooks: Webhooks;
   db: Db;
+  fetchUserById: (userId: number) => Promise<unknown>;
 };
 
 type EnvVars = {
@@ -28,7 +29,7 @@ export type GithubEvent = {
   repo: number;
 };
 
-export type User = {
+export type GithubUser = {
   gitHub_id: number;
   gitHub_handle: string;
   gitHub_avatar: string;

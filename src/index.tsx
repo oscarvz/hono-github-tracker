@@ -2,7 +2,11 @@ import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
 import { handleGitHubEvent } from "./githubEventHandler";
-import { dbMiddleware, githubWebhooksMiddleware } from "./middleware";
+import {
+  dbMiddleware,
+  githubApiMiddleware,
+  githubWebhooksMiddleware,
+} from "./middleware";
 import type { GithubEvent, HonoEnv } from "./types";
 import { getUserInfo, storeUserInfo } from "./userHandler";
 
@@ -10,13 +14,18 @@ const app = new Hono<HonoEnv>();
 
 app.use(createHonoMiddleware(app));
 app.use(dbMiddleware);
+app.use("/ghwh", githubApiMiddleware);
 app.use("/ghwh", githubWebhooksMiddleware);
 
 app.post("/ghwh", async (c) => {
   const webhooks = c.get("webhooks");
+  const fetchUserById = c.get("fetchUserById");
 
   // TODO: Handle star events
-  webhooks.on("star.created", async () => {});
+  webhooks.on("star.created", async ({ payload }) => {
+    const userId = payload.sender.id;
+    const res = await fetchUserById(userId); /* do a db call */
+  });
 });
 
 app.get("/", (c) => c.text("Hello Hono!"));
@@ -35,7 +44,7 @@ app.get("/user", async (c) => {
 });
 
 app.get("/users", async (c) => {
-  const db = c.var.db;
+  const db = c.get("db");
   const users = await db.query.users.findMany();
 
   if (users.length > 0) {

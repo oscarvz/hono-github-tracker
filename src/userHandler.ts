@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/core";
 import { eq } from "drizzle-orm";
 
 import { getDb, users } from "./db";
-import type { User } from "./user";
+import type { User } from "./types";
 
 let octokit: Octokit;
 function getOctokit(githubToken: string) {
