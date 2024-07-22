@@ -1,3 +1,4 @@
+import type { EmitterWebhookEventName } from "@octokit/webhooks";
 import { relations } from "drizzle-orm";
 import {
   integer,
@@ -11,12 +12,12 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 
   // Required fields
   githubUserId: integer("github_user_id").notNull().unique(),
   githubAvatar: text("github_avatar").notNull(),
   githubHandle: text("github_handle").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
 
   // Optional fields
   company: text("company"),
@@ -27,12 +28,10 @@ export const users = pgTable("users", {
   twitterHandle: text("twitter_handle"),
 });
 
-export const eventTypeEnum = pgEnum("event_type", [
-  "fork",
-  "issue",
-  "pull_request",
-  "star",
-]);
+type EventTypes = [EmitterWebhookEventName, ...Array<EmitterWebhookEventName>];
+
+const eventTypes: EventTypes = ["star.created", "star.deleted"];
+export const eventTypeEnum = pgEnum("event_type", eventTypes);
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -41,7 +40,6 @@ export const events = pgTable("events", {
     .references(() => users.id, { onDelete: "cascade" }),
   githubRepo: integer("github_repo").notNull(),
   eventType: eventTypeEnum("event_type").notNull(),
-  eventID: integer("event_id"),
   action: text("action"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
