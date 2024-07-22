@@ -1,14 +1,13 @@
 import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
-import { handleGitHubEvent } from "./githubEventHandler";
+import { events, users } from "./db";
 import {
   dbMiddleware,
   githubApiMiddleware,
   githubWebhooksMiddleware,
 } from "./middleware";
-import type { GithubEvent, HonoEnv } from "./types";
-import { getUserInfo, storeUserInfo } from "./userHandler";
+import type { HonoEnv } from "./types";
 
 const app = new Hono<HonoEnv>();
 
@@ -18,30 +17,43 @@ app.use("/ghwh", githubApiMiddleware);
 app.use("/ghwh", githubWebhooksMiddleware);
 
 app.post("/ghwh", async (c) => {
+  const db = c.get("db");
   const webhooks = c.get("webhooks");
   const fetchUserById = c.get("fetchUserById");
 
-  // TODO: Handle star events
   webhooks.on("star.created", async ({ payload }) => {
     const userId = payload.sender.id;
-    const res = await fetchUserById(userId); /* do a db call */
+    const { data } = await fetchUserById(userId);
+
+    // TODO: As Drizzle ORM doesn't return anything when .returning() is used,
+    // we can't get the id of the user that was inserted. We should probably
+    // change the schema that follows Github's id as the primary key.
+    await db
+      .insert(users)
+      .values({
+        company: data.company,
+        emailAddress: data.email,
+        githubAvatar: data.avatar_url,
+        githubHandle: data.login,
+        githubUserId: data.id,
+        location: data.location,
+        name: data.name,
+        twitterHandle: data.twitter_username,
+      })
+      .onConflictDoNothing({ target: users.githubUserId });
+
+    await db.insert(events).values({
+      eventType: "star.created",
+      githubRepo: payload.repository.id,
+      // See the TODO above; ideally this ID should returned from the insertion
+      // which isn't supported. To use Github's id as the primary key, we need
+      // to change the schema.
+      userId,
+    });
   });
 });
 
 app.get("/", (c) => c.text("Hello Hono!"));
-
-// only for testing the UserHandler and the insert into the db
-app.get("/user", async (c) => {
-  try {
-    const userInfo = await getUserInfo(36015705, c.env.GITHUB_TOKEN);
-    const user = userInfo.user;
-    await storeUserInfo(user, c.env.DATABASE_URL);
-    return c.json(user);
-  } catch (error) {
-    console.error("Error fetching user info:", error);
-    return c.json({ error: "Failed to fetch user info" }, 500);
-  }
-});
 
 app.get("/users", async (c) => {
   const db = c.get("db");
@@ -79,32 +91,5 @@ app.get("/client", (c) =>
     </html>,
   ),
 );
-
-app.post("/githubWebhook", async (c) => {
-  const header = c.req.header();
-  const body = await c.req.json();
-
-  const userGithubId = body.sender.id;
-
-  try {
-    const userInfo = await getUserInfo(userGithubId, c.env.GITHUB_TOKEN);
-    console.log(userInfo);
-    const userId = await storeUserInfo(userInfo.user, c.env.DATABASE_URL);
-
-    const event: GithubEvent = {
-      createdBy: userId,
-      type: header["x-github-event"],
-      action: body.action,
-      repo: body.repository.id,
-    };
-
-    await handleGitHubEvent(event, body, c.env.DATABASE_URL);
-  } catch (error) {
-    console.error("Error fetching user info:", error);
-    return c.json({ error: "Failed to fetch user info" }, 500);
-  }
-
-  return c.html("Yeah");
-});
 
 export default app;

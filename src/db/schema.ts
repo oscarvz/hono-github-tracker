@@ -28,7 +28,11 @@ export const users = pgTable("users", {
   twitterHandle: text("twitter_handle"),
 });
 
-type EventTypes = [EmitterWebhookEventName, ...Array<EmitterWebhookEventName>];
+type SupportedEventType = Extract<
+  EmitterWebhookEventName,
+  "star.created" | "star.deleted"
+>;
+type EventTypes = [SupportedEventType, ...Array<SupportedEventType>];
 
 const eventTypes: EventTypes = ["star.created", "star.deleted"];
 export const eventTypeEnum = pgEnum("event_type", eventTypes);
