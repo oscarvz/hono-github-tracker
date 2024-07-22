@@ -1,5 +1,5 @@
-import { events, getDb } from "../db";
 import type { GithubEvent } from "./types";
+import { events, getDb } from "./db";
 
 export const handleGitHubEvent = async (
   event: GithubEvent,

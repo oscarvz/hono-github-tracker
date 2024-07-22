@@ -1,13 +1,13 @@
 import { Webhooks } from "@octokit/webhooks";
 import { createMiddleware } from "hono/factory";
 
-import type { HonoEnv } from "./types";
+import type { HonoEnv } from "../types";
 
 /**
  * Middleware to verify and handle Github Webhook requests. It exposes the
  * `webhooks` object on the context.
  */
-export const githubWebhooksMiddleware = createMiddleware<HonoEnv>(
+export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
   async (c, next) => {
     const secret = c.env.GITHUB_WEBHOOK_SECRET;
     const webhooks = new Webhooks({ secret });
@@ -21,7 +21,7 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv>(
     const signature = c.req.header("x-hub-signature-256");
     const id = c.req.header("x-request-id");
     if (!id || !name || !signature) {
-      return c.text("Invalid headers", 400);
+      return c.text("Invalid request", 400);
     }
     const payload = await c.req.text();
 

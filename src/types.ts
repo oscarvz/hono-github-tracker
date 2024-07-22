@@ -1,7 +1,10 @@
 import type { Webhooks } from "@octokit/webhooks";
 
+import type { Db } from "./db";
+
 type Variables = {
   webhooks: Webhooks;
+  db: Db;
 };
 
 type EnvVars = {

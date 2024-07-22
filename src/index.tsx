@@ -1,16 +1,15 @@
 import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
-import { getDb } from "../db";
 import { handleGitHubEvent } from "./githubEventHandler";
-import { githubWebhooksMiddleware } from "./middleware";
-import type { GithubEvent } from "./types";
-import type { HonoEnv } from "./types";
+import { dbMiddleware, githubWebhooksMiddleware } from "./middleware";
+import type { GithubEvent, HonoEnv } from "./types";
 import { getUserInfo, storeUserInfo } from "./userHandler";
 
 const app = new Hono<HonoEnv>();
 
 app.use(createHonoMiddleware(app));
+app.use(dbMiddleware);
 app.use("/ghwh", githubWebhooksMiddleware);
 
 app.post("/ghwh", async (c) => {
@@ -36,7 +35,7 @@ app.get("/user", async (c) => {
 });
 
 app.get("/users", async (c) => {
-  const db = getDb(c.env.DATABASE_URL);
+  const db = c.var.db;
   const users = await db.query.users.findMany();
 
   if (users.length > 0) {
