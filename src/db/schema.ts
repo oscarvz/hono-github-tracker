@@ -8,7 +8,6 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -59,15 +58,3 @@ export const eventUser = relations(events, ({ one }) => ({
     references: [users.id],
   }),
 }));
-
-export const selectUserSchema = createSelectSchema(users);
-export const insertUserSchema = createInsertSchema(users).omit({
-  createdAt: true,
-  id: true,
-});
-
-export const selectEventsSchema = createSelectSchema(events);
-export const insertEventsSchema = createInsertSchema(events).omit({
-  createdAt: true,
-  id: true,
-});

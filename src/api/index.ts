@@ -15,34 +15,48 @@ api.post("/ghwh", async (c) => {
   const fetchUserById = c.var.fetchUserById;
 
   webhooks.on("star.created", async ({ payload }) => {
-    const userId = payload.sender.id;
-    const { data } = await fetchUserById(userId);
+    const githubUserId = payload.sender.id;
+    const { data } = await fetchUserById(githubUserId);
 
     // TODO: As Drizzle ORM doesn't return anything when .returning() is used,
     // we can't get the id of the user that was inserted. We should probably
     // change the schema that follows Github's id as the primary key.
-    await db
-      .insert(users)
-      .values({
-        company: data.company,
-        emailAddress: data.email,
-        githubAvatar: data.avatar_url,
-        githubHandle: data.login,
-        githubUserId: data.id,
-        location: data.location,
-        name: data.name,
-        twitterHandle: data.twitter_username,
-      })
-      .onConflictDoNothing({ target: users.githubUserId });
+    try {
+      await db
+        .insert(users)
+        .values({
+          company: data.company,
+          emailAddress: data.email,
+          githubAvatar: data.avatar_url,
+          githubHandle: data.login,
+          githubUserId: data.id,
+          location: data.location,
+          name: data.name,
+          twitterHandle: data.twitter_username,
+        })
+        .onConflictDoNothing({ target: users.githubUserId });
+    } catch (error) {
+      console.error("Error inserting user", error);
+    }
 
-    await db.insert(events).values({
-      eventType: "star.created",
-      githubRepo: payload.repository.id,
-      // See the TODO above; ideally this ID should returned from the insertion
-      // which isn't supported. To use Github's id as the primary key, we need
-      // to change the schema.
-      userId,
-    });
+    try {
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.githubUserId, githubUserId),
+      });
+
+      if (user) {
+        await db.insert(events).values({
+          eventType: "star.created",
+          githubRepo: payload.repository.id,
+          // See the TODO above; ideally this ID should returned from the
+          // insertion which isn't supported. To use Github's id as the primary
+          // key, we need to change the schema.
+          userId: user.id,
+        });
+      }
+    } catch (error) {
+      console.error("Error inserting event", error);
+    }
   });
 });
 
