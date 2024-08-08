@@ -1,28 +1,35 @@
 {
   "name": "hono-github-tracker",
+  "type": "module",
   "scripts": {
-    "dev": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.tsx",
+    "dev": "vite",
+    "build": "vite build --mode client && vite build",
+    "deploy": "$npm_execpath run build && wrangler pages deploy",
     "studio": "bunx @fiberplane/studio@beta",
+    "db:generate": "bun drizzle-kit generate",
+    "db:migrate": "bun drizzle-kit migrate",
     "lint": "biome lint",
     "format": "biome format --write",
-    "ci:format": "biome format",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "biome:ci": "biome ci"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.4",
+    "@octokit/core": "^6.1.2",
     "@octokit/webhooks": "^13.3.0",
-    "@octokit/webhooks-schemas": "^7.5.1",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.0",
-    "eventsource": "^2.0.2",
     "hono": "^4.4.13",
-    "octokit": "^4.0.2"
+    "vite": "^5.3.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@cloudflare/workers-types": "^4.20240712.0",
-    "@fiberplane/hono": "^0.2.0",
+    "@fiberplane/hono": "0.2.1-beta.3",
+    "@hono/vite-cloudflare-pages": "^0.4.2",
+    "@hono/vite-dev-server": "^0.13.1",
+    "@hono/zod-validator": "^0.2.2",
+    "@octokit/types": "^13.5.0",
     "drizzle-kit": "^0.23.0",
     "typescript": "^5.5.3",
     "wrangler": "^3.57.2"

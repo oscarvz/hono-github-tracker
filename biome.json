@@ -25,7 +25,8 @@
       "*.d.ts",
       "dist",
       "migrations",
-      "node_modules"
+      "node_modules",
+      ".fpxconfig"
     ]
   }
 }

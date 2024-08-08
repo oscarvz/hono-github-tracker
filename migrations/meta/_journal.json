@@ -15,6 +15,20 @@
       "when": 1721305294121,
       "tag": "0001_cooing_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1721394580919,
+      "tag": "0002_thankful_junta",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1721647526658,
+      "tag": "0003_charming_phantom_reporter",
+      "breakpoints": true
     }
   ]
 }
