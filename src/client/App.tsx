@@ -5,7 +5,7 @@ export function App() {
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.textContent = "I'm dynamic!";
+      ref.current.textContent = "Client-side logic works!";
     }
   }, []);
 
