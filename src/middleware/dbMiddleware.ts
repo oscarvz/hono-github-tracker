@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 
-import type { HonoEnv } from "../types";
 import { getDb } from "../db";
+import type { HonoEnv } from "../types";
 
 /**
  * Middleware to add the database instance to the context.

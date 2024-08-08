@@ -1,5 +1,5 @@
-import type { Webhooks } from "@octokit/webhooks";
 import type { Endpoints } from "@octokit/types";
+import type { Webhooks } from "@octokit/webhooks";
 
 import type { Db } from "./db";
 

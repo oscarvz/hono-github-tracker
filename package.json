@@ -10,8 +10,8 @@
     "db:migrate": "bun drizzle-kit migrate",
     "lint": "biome lint",
     "format": "biome format --write",
-    "ci:format": "biome format",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "biome:ci": "biome ci"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.4",
