@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       devServer({
         adapter: cloudflareAdapter,
-        entry: "./src/index.tsx",
+        entry: "./src/index.ts",
       }),
       pages(),
     ],
