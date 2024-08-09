@@ -3,12 +3,14 @@ import type { Webhooks } from "@octokit/webhooks";
 
 import type { Db } from "./db";
 
-export type GithubUser = Endpoints["GET /users/{username}"]["response"];
+type GithubUserResponse = Endpoints["GET /users/{username}"]["response"];
+export type GithubUser = GithubUserResponse["data"];
+export type GithubUserId = GithubUser["id"];
 
 type Variables = {
   webhooks: Webhooks;
   db: Db;
-  fetchUserById: (id: number) => Promise<GithubUser>;
+  fetchUserById: (id: GithubUserId) => Promise<GithubUser>;
 };
 
 type EnvVars = {
