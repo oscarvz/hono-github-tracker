@@ -28,9 +28,6 @@ export default defineConfig(({ mode }) => {
     ssr: {
       external: ["react", "react-dom"],
     },
-    server: {
-      port: 5322,
-    },
     build: {
       rollupOptions: {
         output: {
