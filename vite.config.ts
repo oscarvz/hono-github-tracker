@@ -1,6 +1,7 @@
 import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import cloudflareAdapter from "@hono/vite-dev-server/cloudflare";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
@@ -19,12 +20,13 @@ export default defineConfig(({ mode }) => {
         emptyOutDir: false,
         copyPublicDir: false,
       },
+      plugins: [react()],
     };
   }
 
   return {
-    server: {
-      port: 8787,
+    ssr: {
+      external: ["react", "react-dom"],
     },
     build: {
       rollupOptions: {

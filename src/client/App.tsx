@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "hono/jsx";
+import { useEffect, useRef } from "react";
 
 export function App() {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (ref.current) {
