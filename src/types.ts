@@ -1,7 +1,10 @@
 import type { Endpoints } from "@octokit/types";
 import type { Webhooks } from "@octokit/webhooks";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
-import type { Db } from "./db";
+import type * as schema from "./db";
+
+export type Db = NeonHttpDatabase<typeof schema>;
 
 type GithubUserResponse = Endpoints["GET /users/{username}"]["response"];
 export type GithubUser = GithubUserResponse["data"];
