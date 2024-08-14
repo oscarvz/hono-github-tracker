@@ -5,43 +5,25 @@ export const reactRendererMiddleware = reactRenderer(
   ({ children, title }) => {
     const documentTitle = `Github Tracker${title ? ` | ${title}` : ""}`;
 
-    // Borrowed from Honox's link component
+    // Idea borrowed from Honox's link component
     // https://github.com/honojs/honox/blob/main/src/server/components/link.tsx
     const assetImportTags = (() => {
-      if (import.meta.env.PROD) {
-        const manifestRoot = import.meta.glob<{ default: Manifest }>(
-          "/dist/.vite/manifest.json",
-          {
-            eager: true,
-          },
-        );
-
-        const manifest = Object.values(manifestRoot).at(0)?.default;
-        if (!manifest) {
-          return null;
-        }
-
-        return Object.values(manifest).reduce<Array<React.ReactNode>>(
-          (importTags, manifestChunk) => {
-            if (manifestChunk.css) {
-              const cssTags = manifestChunk.css.map((css) => (
-                <link key={css} rel="stylesheet" href={css} />
-              ));
-              importTags.push(cssTags);
-            }
-
-            if (manifestChunk.isEntry) {
-              const scriptTag = (
-                <script type="module" src={manifestChunk.file} />
-              );
-              importTags.push(scriptTag);
-            }
-
-            return importTags;
-          },
-          [],
-        );
+      if (!import.meta.env.PROD) {
+        return;
       }
+
+      const rootManifest = import.meta.glob<{ default: Manifest }>(
+        "/dist/.vite/manifest.json",
+        { eager: true },
+      );
+
+      const manifest = Object.values(rootManifest).at(0)?.default;
+      if (!manifest) {
+        return null;
+      }
+
+      const tags = manifestChunksToTags(manifest);
+      return tags;
     })();
 
     return (
@@ -66,3 +48,24 @@ export const reactRendererMiddleware = reactRenderer(
     docType: true,
   },
 );
+
+function manifestChunksToTags(manifest: Manifest) {
+  return Object.values(manifest).reduce<Array<React.ReactNode>>(
+    (importTags, manifestChunk) => {
+      if (manifestChunk.css) {
+        const cssTags = manifestChunk.css.map((css) => (
+          <link key={css} rel="stylesheet" href={css} />
+        ));
+        importTags.push(cssTags);
+      }
+
+      if (manifestChunk.isEntry) {
+        const scriptTag = <script type="module" src={manifestChunk.file} />;
+        importTags.push(scriptTag);
+      }
+
+      return importTags;
+    },
+    [],
+  );
+}
