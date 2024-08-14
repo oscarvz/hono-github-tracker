@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
         },
         copyPublicDir: false,
         cssMinify: "lightningcss",
+        manifest: true,
       },
       css: {
         transformer: "lightningcss",
