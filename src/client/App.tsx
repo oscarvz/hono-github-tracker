@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import style from "./App.module.css";
 
 export function App() {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -10,7 +11,7 @@ export function App() {
   }, []);
 
   return (
-    <div>
+    <div className={style.app}>
       <h1 ref={ref}>I'm static</h1>
     </div>
   );

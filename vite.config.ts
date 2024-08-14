@@ -2,11 +2,18 @@ import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import cloudflareAdapter from "@hono/vite-dev-server/cloudflare";
 import react from "@vitejs/plugin-react";
+import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 
 export default defineConfig(({ mode }) => {
   if (mode === "client") {
     return {
+      css: {
+        transformer: "lightningcss",
+        lightningcss: {
+          targets: browserslistToTargets([">= 0.25%"]),
+        },
+      },
       esbuild: {
         jsxImportSource: "hono/jsx/dom",
       },
@@ -19,6 +26,8 @@ export default defineConfig(({ mode }) => {
         },
         emptyOutDir: false,
         copyPublicDir: false,
+        cssMinify: "lightningcss",
+        cssCodeSplit: false,
       },
       plugins: [react()],
     };
@@ -40,7 +49,9 @@ export default defineConfig(({ mode }) => {
         adapter: cloudflareAdapter,
         entry: "./src/index.ts",
       }),
-      pages(),
+      pages({
+        entry: "./src/index.ts",
+      }),
     ],
   };
 });
