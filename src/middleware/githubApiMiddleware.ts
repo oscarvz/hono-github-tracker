@@ -5,13 +5,18 @@ import type { GithubUser, GithubUserId, HonoEnv } from "../types";
 
 let octokitInstance: Octokit | undefined;
 
+function getOctokitInstance(token: string) {
+  if (!octokitInstance) {
+    octokitInstance = new Octokit({ auth: token });
+  }
+
+  return octokitInstance;
+}
+
 export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
   async (c, next) => {
     const githubToken = c.env.GITHUB_TOKEN;
-
-    const octokit = octokitInstance
-      ? octokitInstance
-      : new Octokit({ auth: githubToken });
+    const octokit = getOctokitInstance(githubToken);
 
     c.set("fetchUserById", async (id: GithubUserId): Promise<GithubUser> => {
       try {
