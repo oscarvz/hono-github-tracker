@@ -5,11 +5,14 @@ export const reactRendererMiddleware = reactRenderer(
   ({ children, title }) => {
     const documentTitle = `Github Tracker${title ? ` | ${title}` : ""}`;
 
-    // Idea borrowed from Honox's link component
+    // Import the manifest file to get the list of built assets by Vite. This
+    // is only done in production mode & when `build.manifest` is enabled in
+    // vite.config.ts
+    // Idea borrowed from Honox's link component:
     // https://github.com/honojs/honox/blob/main/src/server/components/link.tsx
     const assetImportTags = (() => {
       if (!import.meta.env.PROD) {
-        return;
+        return <script type="module" src="/src/client/index.tsx" />;
       }
 
       const rootManifest = import.meta.glob<{ default: Manifest }>(
@@ -33,11 +36,7 @@ export const reactRendererMiddleware = reactRenderer(
           <meta content="width=device-width, initial-scale=1" name="viewport" />
           <title>{documentTitle}</title>
 
-          {import.meta.env.PROD ? (
-            assetImportTags
-          ) : (
-            <script type="module" src="/src/client/index.tsx" />
-          )}
+          {assetImportTags}
         </head>
 
         <body>{children}</body>
@@ -52,16 +51,16 @@ export const reactRendererMiddleware = reactRenderer(
 function manifestChunksToTags(manifest: Manifest) {
   return Object.values(manifest).reduce<Array<React.ReactNode>>(
     (importTags, manifestChunk) => {
-      if (manifestChunk.css) {
-        const cssTags = manifestChunk.css.map((css) => (
-          <link key={css} rel="stylesheet" href={css} />
+      const { file, css } = manifestChunk;
+
+      const scriptTag = <script key={file} type="module" src={file} />;
+      importTags.push(scriptTag);
+
+      if (css && css.length > 0) {
+        const cssTags = css.map((cssPath) => (
+          <link key={cssPath} rel="stylesheet" href={cssPath} />
         ));
         importTags.push(cssTags);
-      }
-
-      if (manifestChunk.isEntry) {
-        const scriptTag = <script type="module" src={manifestChunk.file} />;
-        importTags.push(scriptTag);
       }
 
       return importTags;
