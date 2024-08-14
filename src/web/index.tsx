@@ -13,4 +13,4 @@ web.get("/", (c) =>
   }),
 );
 
-export { web };
+export default web;

@@ -60,4 +60,4 @@ api.post("/ghwh", async (c) => {
   });
 });
 
-export { api };
+export default api;

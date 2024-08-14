@@ -1,10 +1,10 @@
 import { createHonoMiddleware } from "@fiberplane/hono";
 import { Hono } from "hono";
 
-import { api } from "./api";
+import api from "./api";
 import { dbMiddleware } from "./middleware";
 import type { HonoEnv } from "./types";
-import { web } from "./web";
+import web from "./web";
 
 const app = new Hono<HonoEnv>();
 
