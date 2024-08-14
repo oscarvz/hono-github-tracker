@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           input: "./src/client/index.tsx",
           output: {
-            entryFileNames: "static/client.js",
+            entryFileNames: "assets/[name]-[hash].js",
           },
         },
         copyPublicDir: false,
@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       },
       css: {
         transformer: "lightningcss",
+        devSourcemap: true,
         lightningcss: {
           targets: browserslistToTargets([">= 0.25%"]),
         },

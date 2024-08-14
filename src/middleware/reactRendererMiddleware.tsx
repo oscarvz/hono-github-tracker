@@ -7,7 +7,7 @@ export const reactRendererMiddleware = reactRenderer(
 
     // Borrowed from Honox's link component
     // https://github.com/honojs/honox/blob/main/src/server/components/link.tsx
-    const cssModulesStyles = (() => {
+    const assetImportTags = (() => {
       if (import.meta.env.PROD) {
         const manifestRoot = import.meta.glob<{ default: Manifest }>(
           "/dist/.vite/manifest.json",
@@ -16,21 +16,31 @@ export const reactRendererMiddleware = reactRenderer(
           },
         );
 
-        const manifest = Object.values(manifestRoot).find((v) => v.default);
+        const manifest = Object.values(manifestRoot).at(0)?.default;
         if (!manifest) {
           return null;
         }
 
-        const cssModules = Object.values(manifest.default).find(
-          ({ css }) => css,
-        );
-        if (!cssModules || !cssModules.css) {
-          return null;
-        }
+        return Object.values(manifest).reduce<Array<React.ReactNode>>(
+          (importTags, manifestChunk) => {
+            if (manifestChunk.css) {
+              const cssTags = manifestChunk.css.map((css) => (
+                <link key={css} rel="stylesheet" href={css} />
+              ));
+              importTags.push(cssTags);
+            }
 
-        return cssModules.css.map((css) => (
-          <link key={css} rel="stylesheet" href={css} />
-        ));
+            if (manifestChunk.isEntry) {
+              const scriptTag = (
+                <script type="module" src={manifestChunk.file} />
+              );
+              importTags.push(scriptTag);
+            }
+
+            return importTags;
+          },
+          [],
+        );
       }
     })();
 
@@ -42,10 +52,7 @@ export const reactRendererMiddleware = reactRenderer(
           <title>{documentTitle}</title>
 
           {import.meta.env.PROD ? (
-            <>
-              <script type="module" src="/static/client.js" />
-              {cssModulesStyles}
-            </>
+            assetImportTags
           ) : (
             <script type="module" src="/src/client/index.tsx" />
           )}
