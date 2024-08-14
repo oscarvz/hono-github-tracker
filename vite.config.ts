@@ -8,15 +8,6 @@ import { defineConfig } from "vite";
 export default defineConfig(({ mode }) => {
   if (mode === "client") {
     return {
-      css: {
-        transformer: "lightningcss",
-        lightningcss: {
-          targets: browserslistToTargets([">= 0.25%"]),
-        },
-      },
-      esbuild: {
-        jsxImportSource: "hono/jsx/dom",
-      },
       build: {
         rollupOptions: {
           input: "./src/client/index.tsx",
@@ -24,10 +15,14 @@ export default defineConfig(({ mode }) => {
             entryFileNames: "static/client.js",
           },
         },
-        emptyOutDir: false,
         copyPublicDir: false,
         cssMinify: "lightningcss",
-        cssCodeSplit: false,
+      },
+      css: {
+        transformer: "lightningcss",
+        lightningcss: {
+          targets: browserslistToTargets([">= 0.25%"]),
+        },
       },
       plugins: [react()],
     };
@@ -50,7 +45,7 @@ export default defineConfig(({ mode }) => {
         entry: "./src/index.ts",
       }),
       pages({
-        entry: "./src/index.ts",
+        entry: "./src/web/index.tsx",
       }),
     ],
   };
