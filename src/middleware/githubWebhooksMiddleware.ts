@@ -3,6 +3,8 @@ import { createMiddleware } from "hono/factory";
 
 import type { HonoEnv } from "../types";
 
+let webhooksInstance: Webhooks | undefined;
+
 /**
  * Middleware to verify and handle Github Webhook requests. It exposes the
  * `webhooks` object on the context.
@@ -10,7 +12,10 @@ import type { HonoEnv } from "../types";
 export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
   async (c, next) => {
     const secret = c.env.GITHUB_WEBHOOK_SECRET;
-    const webhooks = new Webhooks({ secret });
+
+    const webhooks = webhooksInstance
+      ? webhooksInstance
+      : new Webhooks({ secret });
 
     c.set("webhooks", webhooks);
     await next();
