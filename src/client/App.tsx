@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
+
 import style from "./App.module.css";
+import "./style.css";
 
 export function App() {
   const ref = useRef<HTMLHeadingElement>(null);
