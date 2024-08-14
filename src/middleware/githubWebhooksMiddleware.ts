@@ -3,7 +3,15 @@ import { createMiddleware } from "hono/factory";
 
 import type { HonoEnv } from "../types";
 
-let webhooksInstance: Webhooks | undefined;
+let webhooks: Webhooks | undefined;
+
+function getWebhooksInstance(secret: string) {
+  if (!webhooks) {
+    webhooks = new Webhooks({ secret });
+  }
+
+  return webhooks;
+}
 
 /**
  * Middleware to verify and handle Github Webhook requests. It exposes the
@@ -12,12 +20,9 @@ let webhooksInstance: Webhooks | undefined;
 export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
   async (c, next) => {
     const secret = c.env.GITHUB_WEBHOOK_SECRET;
-
-    const webhooks = webhooksInstance
-      ? webhooksInstance
-      : new Webhooks({ secret });
-
+    const webhooks = getWebhooksInstance(secret);
     c.set("webhooks", webhooks);
+
     await next();
 
     /*
