@@ -1,4 +1,5 @@
 import { reactRenderer } from "@hono/react-renderer";
+import { ColorSchemeScript } from "@mantine/core";
 import type { Manifest } from "vite";
 
 export const reactRendererMiddleware = reactRenderer(
@@ -38,6 +39,8 @@ export const reactRendererMiddleware = reactRenderer(
           <title>{documentTitle}</title>
 
           {assetImportTags}
+
+          <ColorSchemeScript />
         </head>
 
         <body>
