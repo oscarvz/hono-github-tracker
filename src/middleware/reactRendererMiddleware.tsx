@@ -2,8 +2,9 @@ import { reactRenderer } from "@hono/react-renderer";
 import type { Manifest } from "vite";
 
 export const reactRendererMiddleware = reactRenderer(
-  ({ children, title }) => {
+  ({ children, clientProps, title }) => {
     const documentTitle = `Github Tracker${title ? ` | ${title}` : ""}`;
+    const propsData = JSON.stringify(clientProps);
 
     // Import the manifest file to get the list of built assets by Vite. This
     // is only done in production mode & when `build.manifest` is enabled in
@@ -40,8 +41,13 @@ export const reactRendererMiddleware = reactRenderer(
         </head>
 
         <body>
-          {children}
-          <div id="root" />
+          <header>
+            <h1>{title}</h1>
+          </header>
+
+          <div id="root" data-props={propsData}>
+            {children}
+          </div>
         </body>
       </html>
     );

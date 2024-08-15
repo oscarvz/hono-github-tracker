@@ -3,18 +3,26 @@ import "simpledotcss/simple.min.css";
 
 import "./style.css";
 
-export function App() {
+type AppProps = {
+  greeting: string;
+};
+
+export function App({ greeting }: AppProps) {
   const ref = useRef<HTMLHeadingElement>(null);
 
-  // Simple setup to test client-side logic
   useEffect(() => {
     const titleRef = ref.current;
     if (!titleRef) {
       return;
     }
 
-    titleRef.textContent = "Dashboard";
-  }, []);
+    // Simple setup to get feedback on hydration
+    titleRef.textContent = `Hydrated: ${greeting}`;
 
-  return <h1 ref={ref}>STATIC</h1>;
+    // Remove the data-props attribute after hydration
+    const rootElement = document.getElementById("root");
+    rootElement?.removeAttribute("data-props");
+  }, [greeting]);
+
+  return <h1 ref={ref}>{greeting}</h1>;
 }
