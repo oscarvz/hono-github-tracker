@@ -39,7 +39,10 @@ export const reactRendererMiddleware = reactRenderer(
           {assetImportTags}
         </head>
 
-        <body>{children}</body>
+        <body>
+          {children}
+          <div id="root" />
+        </body>
       </html>
     );
   },

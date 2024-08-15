@@ -1,20 +1,20 @@
 import { useEffect, useRef } from "react";
+import "simpledotcss/simple.min.css";
 
-import style from "./App.module.css";
 import "./style.css";
 
 export function App() {
   const ref = useRef<HTMLHeadingElement>(null);
 
+  // Simple setup to test client-side logic
   useEffect(() => {
-    if (ref.current) {
-      ref.current.textContent = "Client-side logic works!";
+    const titleRef = ref.current;
+    if (!titleRef) {
+      return;
     }
+
+    titleRef.textContent = "Dashboard";
   }, []);
 
-  return (
-    <div className={style.app}>
-      <h1 ref={ref}>I'm static</h1>
-    </div>
-  );
+  return <h1 ref={ref}>STATIC</h1>;
 }
