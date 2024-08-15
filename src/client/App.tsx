@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import "simpledotcss/simple.min.css";
 
 import "./style.css";
@@ -8,21 +8,25 @@ type AppProps = {
 };
 
 export function App({ greeting }: AppProps) {
-  const ref = useRef<HTMLHeadingElement>(null);
+  const [currentGreeting, setCurrentGreeting] = useState(greeting);
+
+  const handleClick = () => setCurrentGreeting(`Clicked: ${greeting}`);
 
   useEffect(() => {
-    const titleRef = ref.current;
-    if (!titleRef) {
-      return;
-    }
-
     // Simple setup to get feedback on hydration
-    titleRef.textContent = `Hydrated: ${greeting}`;
+    setCurrentGreeting(`Hydrated: ${greeting}`);
 
     // Remove the data-props attribute after hydration
     const rootElement = document.getElementById("root");
     rootElement?.removeAttribute("data-props");
   }, [greeting]);
 
-  return <h1 ref={ref}>{greeting}</h1>;
+  return (
+    <div>
+      <h1>{currentGreeting}</h1>
+      <button type="button" onClick={handleClick}>
+        click me!
+      </button>
+    </div>
+  );
 }
