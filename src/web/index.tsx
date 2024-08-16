@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { App } from "../client/App";
+import { Dashboard } from "../client/Dashboard";
 import { reactRendererMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -10,11 +10,14 @@ web.use("*", reactRendererMiddleware);
 
 web.get("/", (c) => {
   const title = "Dashboard";
-  const props = "welcome!";
+  const greeting = "welcome!";
 
-  return c.render(<App greeting={props} />, {
+  return c.render(<Dashboard greeting={greeting} />, {
     title,
-    clientProps: props,
+    clientComponent: {
+      type: "dashboard",
+      props: { greeting },
+    },
   });
 });
 

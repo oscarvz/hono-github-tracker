@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import "simpledotcss/simple.min.css";
 
 import "./style.css";
+import type { DashboardProps } from "./types";
 
-type AppProps = {
-  greeting: string;
-};
-
-export function App({ greeting }: AppProps) {
+export function Dashboard({ greeting }: DashboardProps) {
   const [currentGreeting, setCurrentGreeting] = useState(greeting);
 
   const handleClick = () => setCurrentGreeting(`Clicked: ${greeting}`);

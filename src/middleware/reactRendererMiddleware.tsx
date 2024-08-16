@@ -2,9 +2,9 @@ import { reactRenderer } from "@hono/react-renderer";
 import type { Manifest } from "vite";
 
 export const reactRendererMiddleware = reactRenderer(
-  ({ children, clientProps, title }) => {
+  ({ children, clientComponent, title }) => {
     const documentTitle = `Github Tracker${title ? ` | ${title}` : ""}`;
-    const propsData = JSON.stringify(clientProps);
+    const propsData = JSON.stringify(clientComponent);
 
     // Import the manifest file to get the list of built assets by Vite. This
     // is only done in production mode & when `build.manifest` is enabled in
