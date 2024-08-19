@@ -11,10 +11,6 @@ export function Dashboard({ latestStar }: DashboardProps) {
     rootElement?.removeAttribute("data-props");
   }, []);
 
-  if (!latestStar) {
-    return <p>Nothing to see here</p>;
-  }
-
   return (
     <div>
       <p>
