@@ -1,19 +1,31 @@
 import { Octokit } from "@octokit/core";
 import { createMiddleware } from "hono/factory";
 
-import type { GithubUser, HonoEnv } from "../types";
+import type { GithubUser, GithubUserId, HonoEnv } from "../types";
+
+let octokitInstance: Octokit | undefined;
+
+function getOctokitInstance(token: string) {
+  if (!octokitInstance) {
+    octokitInstance = new Octokit({ auth: token });
+  }
+
+  return octokitInstance;
+}
 
 export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
   async (c, next) => {
     const githubToken = c.env.GITHUB_TOKEN;
-    const octokit = new Octokit({ auth: githubToken });
+    const octokit = getOctokitInstance(githubToken);
 
-    async function fetchUserById(id: number) {
-      const res = await octokit.request("GET /user/{id}", { id });
-      return res as GithubUser;
-    }
-
-    c.set("fetchUserById", fetchUserById);
+    c.set("fetchUserById", async (id: GithubUserId): Promise<GithubUser> => {
+      try {
+        const { data } = await octokit.request("GET /user/{id}", { id });
+        return data;
+      } catch (error) {
+        throw new Error(`Github API: error fetching user by id: ${error}`);
+      }
+    });
 
     await next();
   },

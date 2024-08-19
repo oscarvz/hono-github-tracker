@@ -15,25 +15,32 @@
   },
   "dependencies": {
     "@fiberplane/hono-otel": "^0.1.0-beta.3",
+    "@hono/react-renderer": "^0.2.1",
     "@neondatabase/serverless": "^0.9.4",
     "@octokit/core": "^6.1.2",
     "@octokit/webhooks": "^13.3.0",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.0",
-    "hono": "^4.4.13",
-    "vite": "^5.3.4"
+    "drizzle-orm": "^0.32.2",
+    "hono": "^4.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
-    "@cloudflare/workers-types": "^4.20240712.0",
-    "@fiberplane/hono": "0.2.1-beta.3",
+    "@cloudflare/workers-types": "^4.20240806.0",
+    "@fiberplane/hono": "0.3.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.13.1",
     "@hono/zod-validator": "^0.2.2",
     "@octokit/types": "^13.5.0",
-    "drizzle-kit": "^0.23.0",
-    "typescript": "^5.5.3",
-    "wrangler": "^3.57.2"
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "drizzle-kit": "^0.23.2",
+    "lightningcss": "^1.26.0",
+    "typescript": "^5.5.4",
+    "wrangler": "^3.69.1"
   },
   "packageManager": "bun@1.1.20"
 }

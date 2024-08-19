@@ -16,7 +16,7 @@ api.post("/ghwh", async (c) => {
 
   webhooks.on("star.created", async ({ payload }) => {
     const githubUserId = payload.sender.id;
-    const { data } = await fetchUserById(githubUserId);
+    const user = await fetchUserById(githubUserId);
 
     // TODO: As Drizzle ORM doesn't return anything when .returning() is used,
     // we can't get the id of the user that was inserted. We should probably
@@ -25,14 +25,14 @@ api.post("/ghwh", async (c) => {
       await db
         .insert(users)
         .values({
-          company: data.company,
-          emailAddress: data.email,
-          githubAvatar: data.avatar_url,
-          githubHandle: data.login,
-          githubUserId: data.id,
-          location: data.location,
-          name: data.name,
-          twitterHandle: data.twitter_username,
+          company: user.company,
+          emailAddress: user.email,
+          githubAvatar: user.avatar_url,
+          githubHandle: user.login,
+          githubUserId: user.id,
+          location: user.location,
+          name: user.name,
+          twitterHandle: user.twitter_username,
         })
         .onConflictDoNothing({ target: users.githubUserId });
     } catch (error) {
@@ -60,4 +60,4 @@ api.post("/ghwh", async (c) => {
   });
 });
 
-export { api };
+export default api;

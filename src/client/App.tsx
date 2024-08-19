@@ -1,7 +1,10 @@
-import { useEffect, useRef } from "hono/jsx";
+import { useEffect, useRef } from "react";
+
+import style from "./App.module.css";
+import "./style.css";
 
 export function App() {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -10,7 +13,7 @@ export function App() {
   }, []);
 
   return (
-    <div>
+    <div className={style.app}>
       <h1 ref={ref}>I'm static</h1>
     </div>
   );

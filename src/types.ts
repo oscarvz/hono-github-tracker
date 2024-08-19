@@ -1,14 +1,19 @@
 import type { Endpoints } from "@octokit/types";
 import type { Webhooks } from "@octokit/webhooks";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 
-import type { Db } from "./db";
+import type * as schema from "./db";
 
-export type GithubUser = Endpoints["GET /users/{username}"]["response"];
+export type Db = NeonHttpDatabase<typeof schema>;
+
+type GithubUserResponse = Endpoints["GET /users/{username}"]["response"];
+export type GithubUser = GithubUserResponse["data"];
+export type GithubUserId = GithubUser["id"];
 
 type Variables = {
   webhooks: Webhooks;
   db: Db;
-  fetchUserById: (id: number) => Promise<GithubUser>;
+  fetchUserById: (id: GithubUserId) => Promise<GithubUser>;
 };
 
 type EnvVars = {
