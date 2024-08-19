@@ -1,29 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "simpledotcss/simple.min.css";
 
 import "./style.css";
 import type { DashboardProps } from "./types";
 
-export function Dashboard({ greeting }: DashboardProps) {
-  const [currentGreeting, setCurrentGreeting] = useState(greeting);
-
-  const handleClick = () => setCurrentGreeting(`Clicked: ${greeting}`);
-
+export function Dashboard({ latestStar }: DashboardProps) {
+  // Remove the data-props attribute after hydration
   useEffect(() => {
-    // Simple setup to get feedback on hydration
-    setCurrentGreeting(`Hydrated: ${greeting}`);
-
-    // Remove the data-props attribute after hydration
     const rootElement = document.getElementById("root");
     rootElement?.removeAttribute("data-props");
-  }, [greeting]);
+  }, []);
+
+  if (!latestStar) {
+    return <p>Nothing to see here</p>;
+  }
 
   return (
     <div>
-      <h1>{currentGreeting}</h1>
-      <button type="button" onClick={handleClick}>
-        click me!
-      </button>
+      <p>
+        {latestStar ? <>Latest star: {latestStar}</> : "Nothing to see here"}
+      </p>
     </div>
   );
 }

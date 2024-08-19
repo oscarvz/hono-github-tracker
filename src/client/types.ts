@@ -1,7 +1,7 @@
 export type ClientComponent = Dashboard | AdminDashboard;
 
 export type DashboardProps = {
-  greeting: string;
+  latestStar?: string;
 };
 
 // TODO: Now for demonstration purposes; replace with schema data

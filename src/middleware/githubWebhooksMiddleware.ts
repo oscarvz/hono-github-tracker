@@ -21,6 +21,7 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
   async (c, next) => {
     const secret = c.env.GITHUB_WEBHOOK_SECRET;
     const webhooks = getWebhooksInstance(secret);
+
     c.set("webhooks", webhooks);
 
     await next();
