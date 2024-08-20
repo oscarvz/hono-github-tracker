@@ -14,7 +14,7 @@
     "biome:ci": "biome ci"
   },
   "dependencies": {
-    "@fiberplane/hono-otel": "https://pkg.pr.new/fiberplane/fpx/@fiberplane/hono-otel@149",
+    "@fiberplane/hono-otel": "0.1.0-beta.9",
     "@hono/react-renderer": "^0.2.1",
     "@neondatabase/serverless": "^0.9.4",
     "@octokit/core": "^6.1.2",
