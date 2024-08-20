@@ -1,4 +1,4 @@
-import { createHonoMiddleware } from "@fiberplane/hono";
+import { instrument } from "@fiberplane/hono-otel";
 import { Hono } from "hono";
 
 import api from "./api";
@@ -8,10 +8,9 @@ import web from "./web";
 
 const app = new Hono<HonoEnv>();
 
-app.use(createHonoMiddleware(app));
 app.use(dbMiddleware);
 
 app.route("/", web);
 app.route("/api", api);
 
-export default app;
+export default instrument(app);
