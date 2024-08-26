@@ -5,6 +5,8 @@ import react from "@vitejs/plugin-react";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig } from "vite";
 
+const entry = "./src/index.ts";
+
 export default defineConfig(({ mode }) => {
   if (mode === "client") {
     return {
@@ -17,6 +19,7 @@ export default defineConfig(({ mode }) => {
         },
         copyPublicDir: false,
         cssMinify: "lightningcss",
+        emptyOutDir: true,
         manifest: true,
       },
       css: {
@@ -47,11 +50,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       devServer({
         adapter: cloudflareAdapter,
-        entry: "./src/index.ts",
+        entry,
       }),
-      pages({
-        entry: "./src/web/index.tsx",
-      }),
+      pages({ entry }),
     ],
   };
 });

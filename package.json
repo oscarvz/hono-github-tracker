@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode client && vite build",
+    "preview": "bun run build && wrangler pages dev",
     "deploy": "$npm_execpath run build && wrangler pages deploy",
     "studio": "bunx @fiberplane/studio@beta",
     "db:generate": "bun drizzle-kit generate",
