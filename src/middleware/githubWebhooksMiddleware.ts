@@ -1,7 +1,7 @@
 import { Webhooks } from "@octokit/webhooks";
 import { createMiddleware } from "hono/factory";
 
-import type { HonoEnv } from "../types";
+import { isWebhookEventName, type HonoEnv } from "../types";
 
 let webhooks: Webhooks | undefined;
 
@@ -25,16 +25,15 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
 
     await next();
 
-    /*
-      biome-ignore lint/suspicious/noExplicitAny: type not exposed by
-      octokit/webhooks
-    */
-    const name = c.req.header("x-github-event") as any;
-    const signature = c.req.header("x-hub-signature-256");
     const id = c.req.header("x-github-delivery");
-    if (!id || !name || !signature) {
-      return c.text("Invalid request", 400);
+    const signature = c.req.header("x-hub-signature-256");
+    const name = c.req.header("x-github-event");
+
+    const isEventName = isWebhookEventName(name);
+    if (!(id && isEventName && signature)) {
+      return c.text("Invalid request", 403);
     }
+
     const payload = await c.req.text();
 
     try {
@@ -44,7 +43,7 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
         signature,
         payload,
       });
-      return c.text("OK");
+      return c.text("Webhook received & verified", 201);
     } catch (error) {
       return c.text(`Failed to verify Github Webhook request: ${error}`, 400);
     }

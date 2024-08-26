@@ -13,6 +13,10 @@ function getOctokitInstance(token: string) {
   return octokitInstance;
 }
 
+/**
+ * Middleware to interact with the Github API. It exposes the `fetchUserById`
+ * function on the context.
+ */
 export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
   async (c, next) => {
     const githubToken = c.env.GITHUB_TOKEN;
