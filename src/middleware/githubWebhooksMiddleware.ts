@@ -31,7 +31,7 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
     */
     const name = c.req.header("x-github-event") as any;
     const signature = c.req.header("x-hub-signature-256");
-    const id = c.req.header("x-request-id");
+    const id = c.req.header("x-github-delivery");
     if (!id || !name || !signature) {
       return c.text("Invalid request", 400);
     }
