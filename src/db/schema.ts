@@ -35,6 +35,7 @@ export const events = pgTable("events", {
     .references(() => repositories.id, {
       onDelete: "cascade",
     }),
+  eventId: integer("event_id"),
   eventName: text("event_name").notNull(),
   eventAction: text("event_action").notNull(),
 });
