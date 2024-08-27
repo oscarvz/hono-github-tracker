@@ -1,7 +1,7 @@
 import { Webhooks } from "@octokit/webhooks";
 import { createMiddleware } from "hono/factory";
 
-import { isWebhookEventName, type HonoEnv } from "../types";
+import { type HonoEnv, isWebhookEventName } from "../types";
 
 let webhooks: Webhooks | undefined;
 

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { events, users } from "../db";
+import { events, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -17,6 +17,22 @@ api.post("/ghwh", async (c) => {
   webhooks.on(["star.created", "watch.started"], async ({ payload, name }) => {
     const userId = payload.sender.id;
     const user = await fetchUserById(userId);
+
+    try {
+      await db
+        .insert(repositories)
+        .values({
+          description: payload.repository.description,
+          fullName: payload.repository.full_name,
+          id: payload.repository.id,
+          name: payload.repository.name,
+          stargazersCount: payload.repository.stargazers_count,
+          watchersCount: payload.repository.watchers_count,
+        })
+        .onConflictDoNothing({ target: repositories.id });
+    } catch (error) {
+      return c.text(`Error fetching repository: ${error}`, 500);
+    }
 
     try {
       await db
@@ -37,12 +53,17 @@ api.post("/ghwh", async (c) => {
     }
 
     try {
-      await db.insert(events).values({
-        eventAction: payload.action,
-        eventName: name,
-        repoId: payload.repository.id,
-        userId,
-      });
+      await db
+        .insert(events)
+        .values({
+          eventAction: payload.action,
+          eventName: name,
+          repoId: payload.repository.id,
+          userId,
+        })
+        .onConflictDoNothing({
+          target: [events.eventName, events.eventAction],
+        });
     } catch (error) {
       return c.text(`Error inserting event: ${error}`, 500);
     }
