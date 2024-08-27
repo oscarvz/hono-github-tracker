@@ -41,12 +41,12 @@ export const events = pgTable("events", {
 });
 
 export const repositoriesEvents = relations(repositories, ({ many }) => ({
-  interactions: many(events),
+  events: many(events),
   users: many(users),
 }));
 
 export const usersEvents = relations(users, ({ many }) => ({
-  interactions: many(events),
+  events: many(events),
 }));
 
 export const eventsUser = relations(events, ({ one }) => ({
