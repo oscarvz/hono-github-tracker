@@ -29,7 +29,7 @@ export type GithubUserId = GithubUser["id"];
 
 // Octokit isn't exporting this particular type, so we extract it from the
 // `verifyAndReceive` method.
-type WebhookEventName = Parameters<
+export type WebhookEventName = Parameters<
   InstanceType<typeof Webhooks>["verifyAndReceive"]
 >[number]["name"];
 

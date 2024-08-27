@@ -14,48 +14,37 @@ api.post("/ghwh", async (c) => {
   const webhooks = c.var.webhooks;
   const fetchUserById = c.var.fetchUserById;
 
-  webhooks.on("star.created", async ({ payload }) => {
-    const githubUserId = payload.sender.id;
-    const user = await fetchUserById(githubUserId);
+  webhooks.on(["star.created", "watch.started"], async ({ payload, name }) => {
+    const userId = payload.sender.id;
+    const user = await fetchUserById(userId);
 
-    // TODO: As Drizzle ORM doesn't return anything when .returning() is used,
-    // we can't get the id of the user that was inserted. We should probably
-    // change the schema that follows Github's id as the primary key.
     try {
       await db
         .insert(users)
         .values({
+          avatar: user.avatar_url,
           company: user.company,
           emailAddress: user.email,
-          githubAvatar: user.avatar_url,
-          githubHandle: user.login,
-          githubUserId: user.id,
+          handle: user.login,
+          id: user.id,
           location: user.location,
           name: user.name,
           twitterHandle: user.twitter_username,
         })
-        .onConflictDoNothing({ target: users.githubUserId });
+        .onConflictDoNothing({ target: users.id });
     } catch (error) {
-      console.error("Error inserting user", error);
+      return c.text(`Error inserting user: ${error}`, 500);
     }
 
     try {
-      const user = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.githubUserId, githubUserId),
+      await db.insert(events).values({
+        eventAction: payload.action,
+        eventName: name,
+        repoId: payload.repository.id,
+        userId,
       });
-
-      if (user) {
-        await db.insert(events).values({
-          eventType: "star.created",
-          githubRepo: payload.repository.id,
-          // See the TODO above; ideally this ID should returned from the
-          // insertion which isn't supported. To use Github's id as the primary
-          // key, we need to change the schema.
-          userId: user.id,
-        });
-      }
     } catch (error) {
-      console.error("Error inserting event", error);
+      return c.text(`Error inserting event: ${error}`, 500);
     }
   });
 });
