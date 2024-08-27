@@ -61,18 +61,13 @@ api.post("/ghwh", async (c) => {
       }
 
       try {
-        await db
-          .insert(events)
-          .values({
-            eventId,
-            eventAction: payload.action,
-            eventName: name,
-            repoId: payload.repository.id,
-            userId,
-          })
-          .onConflictDoNothing({
-            target: [events.eventName, events.eventAction],
-          });
+        await db.insert(events).values({
+          eventId,
+          eventAction: payload.action,
+          eventName: name,
+          repoId: payload.repository.id,
+          userId,
+        });
       } catch (error) {
         return c.text(`Error inserting event: ${error}`, 500);
       }
