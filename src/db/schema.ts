@@ -29,11 +29,11 @@ export const users = pgTable("users", {
 
 type SupportedEventType = Extract<
   EmitterWebhookEventName,
-  "star.created" | "star.deleted"
+  "star.created" | "star.deleted" | "issues.opened" | "issue_comment.created"
 >;
 type EventTypes = [SupportedEventType, ...Array<SupportedEventType>];
 
-const eventTypes: EventTypes = ["star.created", "star.deleted"];
+const eventTypes: EventTypes = ["star.created", "star.deleted", "issues.opened", "issue_comment.created"];
 export const eventTypeEnum = pgEnum("event_type", eventTypes);
 
 export const events = pgTable("events", {
