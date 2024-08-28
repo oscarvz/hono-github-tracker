@@ -1,6 +1,9 @@
 # Hono Github Tracker
 
-Measure interactions on your Github repositories! Reach out to your fans!
+> Measure interactions on your Github repositories! Reach out to your fans!
+
+Hono Github Tracker is a simple app to track interactions on your Github
+repositories. It listens to Github Webhooks and stores the events in a database.
 
 ## Getting started
 
@@ -66,3 +69,4 @@ into issues, have questions or suggestions, feel free to open an issue.
 
 - [ ] [Authenticated dashboard](https://github.com/oscarvz/hono-github-tracker/issues/14):
       we shouldn't expose the dashboard to the public.
+      s
