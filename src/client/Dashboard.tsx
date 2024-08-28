@@ -13,7 +13,12 @@ import type { DashboardProps } from "./types";
 export function Dashboard({ repositories }: DashboardProps) {
   return (
     <AppShell header={{ height: 60 }} padding="md">
-      <AppShell.Header p="md">Github Tracker</AppShell.Header>
+      <AppShell.Header p="md">
+        <Text size="lg" fw="bold">
+          Hono Github Tracker
+        </Text>
+      </AppShell.Header>
+
       <AppShell.Main>
         <Grid>
           {repositories.map(
