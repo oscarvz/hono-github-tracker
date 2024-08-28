@@ -1,20 +1,31 @@
-import { useEffect, useRef } from "react";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import { useEffect } from "react";
 
-import style from "./App.module.css";
-import "./style.css";
+import { Dashboard } from "./Dashboard";
+import type { ClientComponent } from "./types";
 
-export function App() {
-  const ref = useRef<HTMLHeadingElement>(null);
-
+export function App(props: ClientComponent) {
+  // Remove the data-props attribute after hydration
   useEffect(() => {
-    if (ref.current) {
-      ref.current.textContent = "Client-side logic works!";
-    }
+    const rootElement = document.getElementById("root");
+    rootElement?.removeAttribute("data-props");
   }, []);
 
   return (
-    <div className={style.app}>
-      <h1 ref={ref}>I'm static</h1>
-    </div>
+    <MantineProvider defaultColorScheme="auto">
+      <Component {...props} />
+    </MantineProvider>
   );
+}
+
+function Component({ type, props }: ClientComponent) {
+  switch (type) {
+    case "dashboard":
+      return <Dashboard {...props} />;
+    // case "adminDashboard":
+    //   return <AdminDashboard {...props} />;
+    default:
+      return null;
+  }
 }

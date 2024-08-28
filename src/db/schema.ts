@@ -55,3 +55,5 @@ export const eventsUser = relations(events, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type Repository = typeof repositories.$inferSelect;

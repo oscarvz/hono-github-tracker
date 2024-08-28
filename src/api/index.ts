@@ -31,7 +31,13 @@ api.post("/ghwh", async (c) => {
             stargazersCount: payload.repository.stargazers_count,
             watchersCount: payload.repository.watchers_count,
           })
-          .onConflictDoNothing({ target: repositories.id });
+          .onConflictDoUpdate({
+            target: repositories.id,
+            set: {
+              stargazersCount: payload.repository.stargazers_count,
+              watchersCount: payload.repository.watchers_count,
+            },
+          });
       } catch (error) {
         return c.text(`Error fetching repository: ${error}`, 500);
       }

@@ -1,9 +1,11 @@
 import { reactRenderer } from "@hono/react-renderer";
+import { ColorSchemeScript } from "@mantine/core";
 import type { Manifest } from "vite";
 
 export const reactRendererMiddleware = reactRenderer(
-  ({ children, title }) => {
+  ({ children, clientComponent, title }) => {
     const documentTitle = `Github Tracker${title ? ` | ${title}` : ""}`;
+    const propsData = JSON.stringify(clientComponent);
 
     // Import the manifest file to get the list of built assets by Vite. This
     // is only done in production mode & when `build.manifest` is enabled in
@@ -37,9 +39,14 @@ export const reactRendererMiddleware = reactRenderer(
           <title>{documentTitle}</title>
 
           {assetImportTags}
+          <ColorSchemeScript defaultColorScheme="auto" />
         </head>
 
-        <body>{children}</body>
+        <body>
+          <div id="root" data-props={propsData}>
+            {children}
+          </div>
+        </body>
       </html>
     );
   },
