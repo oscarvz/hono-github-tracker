@@ -42,7 +42,6 @@ export const events = pgTable("events", {
 
 export const repositoriesEvents = relations(repositories, ({ many }) => ({
   events: many(events),
-  users: many(users),
 }));
 
 export const usersEvents = relations(users, ({ many }) => ({
