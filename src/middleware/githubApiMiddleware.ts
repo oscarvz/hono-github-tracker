@@ -19,7 +19,7 @@ function getOctokitInstance(token: string) {
  */
 export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
   async (c, next) => {
-    const githubToken = c.env.GITHUB_TOKEN;
+    const githubToken = c.env.GITHUB_API_TOKEN;
     const octokit = getOctokitInstance(githubToken);
 
     const fetchUserById: FetchUserById = async (id) => {

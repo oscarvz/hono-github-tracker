@@ -29,7 +29,7 @@ export function Dashboard({ repositories }: DashboardProps) {
               stargazersCount,
               watchersCount,
             }) => (
-              <GridCol key={fullName} span={4}>
+              <GridCol key={fullName} span="content">
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Text fw={500}>{fullName}</Text>
 
