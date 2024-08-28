@@ -9,7 +9,7 @@ export type Db = NeonHttpDatabase<typeof schema>;
 type Variables = {
   webhooks: Webhooks;
   db: Db;
-  fetchUserById: (id: GithubUserId) => Promise<GithubUser>;
+  fetchUserById: FetchUserById;
 };
 
 type EnvVars = {
@@ -23,9 +23,9 @@ export type HonoEnv = {
   Bindings: EnvVars;
 };
 
-type GithubUserResponse = Endpoints["GET /users/{username}"]["response"];
-export type GithubUser = GithubUserResponse["data"];
-export type GithubUserId = GithubUser["id"];
+type GithubUser = Endpoints["GET /users/{username}"]["response"]["data"];
+
+export type FetchUserById = (id: GithubUser["id"]) => Promise<GithubUser>;
 
 // Octokit isn't exporting this particular type, so we extract it from the
 // `verifyAndReceive` method.

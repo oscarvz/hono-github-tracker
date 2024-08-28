@@ -15,7 +15,7 @@ api.post("/ghwh", async (c) => {
   const fetchUserById = c.var.fetchUserById;
 
   webhooks.on(
-    ["star.created", "watch.started", "issues.opened"],
+    ["issues.opened", "star.created", "watch.started"],
     async ({ payload, name }) => {
       const userId = payload.sender.id;
       const user = await fetchUserById(userId);
