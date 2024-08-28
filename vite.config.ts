@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
       port: 8787,
     },
     ssr: {
-      external: ["react", "react-dom"],
+      external: ["@mantine/core", "@mantine/hooks", "react-dom", "react"],
     },
     build: {
       rollupOptions: {

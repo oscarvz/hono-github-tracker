@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 
-import { Dashboard } from "../client/Dashboard";
-import type { DashboardProps } from "../client/types";
+import { App } from "../client/App";
 import { reactRendererMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -23,11 +22,11 @@ web.get("/", async (c) => {
     },
   });
 
-  const props: DashboardProps = {
+  const props = {
     latestStar: userWithLatestStar?.handle,
   };
 
-  return c.render(<Dashboard {...props} />, {
+  return c.render(<App type="dashboard" props={props} />, {
     title: "Dashboard",
     clientComponent: {
       type: "dashboard",
