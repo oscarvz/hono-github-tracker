@@ -15,15 +15,16 @@ web.get("/", async (c) => {
   // FIXME: Investigate why this breaks in production build
   const userWithLatestStar = await db.query.users.findFirst({
     with: {
-      interactions: {
-        where: ({ eventType }, { eq }) => eq(eventType, "star.created"),
+      events: {
+        where: ({ eventName, eventAction }, { and, eq }) =>
+          and(eq(eventName, "star"), eq(eventAction, "created")),
         orderBy: ({ createdAt }, { asc }) => asc(createdAt),
       },
     },
   });
 
   const props: DashboardProps = {
-    latestStar: userWithLatestStar?.githubHandle,
+    latestStar: userWithLatestStar?.handle,
   };
 
   return c.render(<Dashboard {...props} />, {
