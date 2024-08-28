@@ -3,6 +3,7 @@ import { hydrateRoot } from "react-dom/client";
 
 import { App } from "./App";
 import type { ClientComponent } from "./types";
+export * from "./types";
 
 const rootElement = document.getElementById("root");
 const propsData = rootElement?.getAttribute("data-props");

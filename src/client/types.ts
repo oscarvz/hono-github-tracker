@@ -1,7 +1,13 @@
+import type { Repository } from "../db";
+
 export type ClientComponent = Dashboard | AdminDashboard;
 
 export type DashboardProps = {
-  latestStar?: string;
+  repositories: Array<
+    Repository & {
+      latestStar?: string;
+    }
+  >;
 };
 
 // TODO: Now for demonstration purposes; replace with schema data
@@ -21,9 +27,3 @@ export type AdminDashboard = {
   type: "adminDashboard";
   props: AdminDashboardProps;
 };
-
-export function isDashboardProps(
-  component: ClientComponent,
-): component is Dashboard {
-  return component.type === "dashboard";
-}

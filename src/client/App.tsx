@@ -13,11 +13,9 @@ export function App(props: ClientComponent) {
   }, []);
 
   return (
-    <>
-      <MantineProvider defaultColorScheme="dark">
-        <Component {...props} />
-      </MantineProvider>
-    </>
+    <MantineProvider defaultColorScheme="auto">
+      <Component {...props} />
+    </MantineProvider>
   );
 }
 

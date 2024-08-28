@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 
+import type { DashboardProps } from "../client";
 import { App } from "../client/App";
 import { reactRendererMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
@@ -11,20 +12,8 @@ web.use("*", reactRendererMiddleware);
 web.get("/", async (c) => {
   const db = c.var.db;
 
-  // FIXME: Investigate why this breaks in production build
-  const userWithLatestStar = await db.query.users.findFirst({
-    with: {
-      events: {
-        where: ({ eventName, eventAction }, { and, eq }) =>
-          and(eq(eventName, "star"), eq(eventAction, "created")),
-        orderBy: ({ createdAt }, { asc }) => asc(createdAt),
-      },
-    },
-  });
-
-  const props = {
-    latestStar: userWithLatestStar?.handle,
-  };
+  const repositories = await db.query.repositories.findMany();
+  const props: DashboardProps = { repositories };
 
   return c.render(<App type="dashboard" props={props} />, {
     title: "Dashboard",

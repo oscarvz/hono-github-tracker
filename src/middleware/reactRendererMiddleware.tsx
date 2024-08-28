@@ -39,7 +39,7 @@ export const reactRendererMiddleware = reactRenderer(
           <title>{documentTitle}</title>
 
           {assetImportTags}
-          <ColorSchemeScript defaultColorScheme="dark" />
+          <ColorSchemeScript defaultColorScheme="auto" />
         </head>
 
         <body>
