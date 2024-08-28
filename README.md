@@ -1,6 +1,6 @@
 # Hono Github Tracker
 
-Measure interactions on your Github repositories!
+Measure interactions on your Github repositories! Reach out to your fans!
 
 ## Getting started
 
@@ -13,7 +13,8 @@ to monitor.
 
 > [!note]
 > Make sure you configure the webhook to listen to the changes you're
-interested in, and update the array of the event listener in `src/api/index.ts`.
+> interested in, and update the array of the event listener in
+> `src/api/index.ts`.
 
 To get started locally, you will need to create a `.dev.vars` file in the root
 of the project, with the following three variables:
@@ -25,7 +26,37 @@ GITHUB_API_TOKEN=github_...
 GITHUB_WEBHOOK_SECRET=...
 ```
 
+> [!tip]
+> If using `bun` feels too edgy, just use your favourite package manager.
+
 ```shell
 bun install
 bun dev
 ```
+
+Your app will start on `localhost:8787`.
+
+### Receiving Webhooks
+
+To receive webhooks, you will need to expose your local server to the internet.
+You could use Ngrok, VS Code Ports or any other tool you're comfortable with.
+
+Hono Github Tracker is using FPX for local development, which has a neat feature
+to [proxy Webhook requests](https://fiberplane.com/docs/features/webhooks/) to
+your local development server.
+
+To make use of FPX proxying, run FPX in a separate terminal:
+
+```shell
+bun studio
+```
+
+> [!important]
+> When using any proxy tool, make sure to append the URL with `/api/ghwh`
+
+## TODO
+
+This app is under active (though not always fast) development. If you're running
+into issues, have questions or suggestions, feel free to open an issue.
+
+- [ ] [Authenticated dashboard](https://github.com/oscarvz/hono-github-tracker/issues/14)
