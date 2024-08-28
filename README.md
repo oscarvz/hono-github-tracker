@@ -54,9 +54,15 @@ bun studio
 > [!important]
 > When using any proxy tool, make sure to append the URL with `/api/ghwh`
 
+## Dashboard
+
+The app exposes a dashboard on `localhost:8787/` with basic information about
+the repositories you're tracking.
+
 ## TODO
 
 This app is under active (though not always fast) development. If you're running
 into issues, have questions or suggestions, feel free to open an issue.
 
-- [ ] [Authenticated dashboard](https://github.com/oscarvz/hono-github-tracker/issues/14)
+- [ ] [Authenticated dashboard](https://github.com/oscarvz/hono-github-tracker/issues/14):
+      we shouldn't expose the dashboard to the public.
