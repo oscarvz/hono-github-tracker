@@ -1,5 +1,6 @@
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 import { useEffect } from "react";
-import "simpledotcss/simple.min.css";
 
 import "./style.css";
 import type { DashboardProps } from "./types";
@@ -12,10 +13,12 @@ export function Dashboard({ latestStar }: DashboardProps) {
   }, []);
 
   return (
-    <div>
-      <p>
-        {latestStar ? <>Latest star: {latestStar}</> : "Nothing to see here"}
-      </p>
-    </div>
+    <MantineProvider>
+      <div>
+        <p>
+          {latestStar ? <>Latest star: {latestStar}</> : "Nothing to see here"}
+        </p>
+      </div>
+    </MantineProvider>
   );
 }
