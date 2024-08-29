@@ -40,19 +40,25 @@ export const events = pgTable("events", {
   eventAction: text("event_action").notNull(),
 });
 
-export const repositoriesEvents = relations(repositories, ({ many }) => ({
+export const repositoriesRelations = relations(repositories, ({ many }) => ({
   events: many(events),
 }));
 
-export const usersEvents = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
   events: many(events),
 }));
 
-export const eventsUser = relations(events, ({ one }) => ({
+export const eventsRelations = relations(events, ({ one }) => ({
   user: one(users, {
     fields: [events.userId],
     references: [users.id],
   }),
+  repository: one(repositories, {
+    fields: [events.repoId],
+    references: [repositories.id],
+  }),
 }));
 
 export type Repository = typeof repositories.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type Event = typeof events.$inferSelect;

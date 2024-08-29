@@ -1,6 +1,4 @@
-import type { Repository } from "../db";
-
-export type ClientComponent = Dashboard | AdminDashboard;
+import type { Event, Repository } from "../db";
 
 export type DashboardProps = {
   repositories: Array<
@@ -10,12 +8,16 @@ export type DashboardProps = {
   >;
 };
 
-// TODO: Now for demonstration purposes; replace with schema data
 export type AdminDashboardProps = {
-  tableData: Array<{
-    name: string;
-    userHandle: number;
-  }>;
+  repositories: Array<
+    Repository & {
+      events: Array<Event>;
+    }
+  >;
+  params?: {
+    repoId?: number;
+    activeTab?: string;
+  };
 };
 
 export type Dashboard = {
@@ -27,3 +29,5 @@ export type AdminDashboard = {
   type: "adminDashboard";
   props: AdminDashboardProps;
 };
+
+export type ClientComponent = Dashboard | AdminDashboard;

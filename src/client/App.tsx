@@ -2,6 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { useEffect } from "react";
 
+import { AdminDashboard } from "./AdminDashboard";
 import { Dashboard } from "./Dashboard";
 import type { ClientComponent } from "./types";
 
@@ -23,9 +24,7 @@ function Component({ type, props }: ClientComponent) {
   switch (type) {
     case "dashboard":
       return <Dashboard {...props} />;
-    // case "adminDashboard":
-    //   return <AdminDashboard {...props} />;
-    default:
-      return null;
+    case "adminDashboard":
+      return <AdminDashboard {...props} />;
   }
 }

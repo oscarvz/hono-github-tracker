@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import type { DashboardProps } from "../client";
+import type { AdminDashboardProps, DashboardProps } from "../client";
 import { App } from "../client/App";
 import { reactRendererMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
@@ -19,6 +19,41 @@ web.get("/", async (c) => {
     title: "Dashboard",
     clientComponent: {
       type: "dashboard",
+      props,
+    },
+  });
+});
+
+// TODO: Add authentication middleware
+web.get("/admin", async (c) => {
+  const repoId = c.req.query("repoId");
+  const activeTab = c.req.query("activeTab");
+
+  const db = c.var.db;
+
+  const repositories = await db.query.repositories.findMany({
+    with: {
+      events: true,
+    },
+  });
+
+  let parsedRepoId: number | undefined;
+  if (repoId) {
+    parsedRepoId = Number.parseInt(repoId, 10);
+  }
+
+  const props: AdminDashboardProps = {
+    repositories,
+    params: {
+      repoId: parsedRepoId,
+      activeTab,
+    },
+  };
+
+  return c.render(<App type="adminDashboard" props={props} />, {
+    title: "Admin Dashboard",
+    clientComponent: {
+      type: "adminDashboard",
       props,
     },
   });
