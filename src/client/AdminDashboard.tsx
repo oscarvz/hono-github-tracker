@@ -46,12 +46,10 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     return {
       caption: "Events",
       head: ["User ID", "Date", "Event", "Action"],
-      body: events.map(({ userId, createdAt, eventAction, eventName }) => [
-        userId,
-        new Date(createdAt).toDateString(),
-        eventName,
-        eventAction,
-      ]),
+      body: events.map(({ userId, createdAt, eventAction, eventName }) => {
+        const date = createdAt ? new Date(createdAt).toDateString() : "unknown";
+        return [userId, date, eventName, eventAction];
+      }),
     };
   }, [repoId, repositories]);
 
