@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 export const repositories = pgTable("repositories", {
@@ -12,7 +12,7 @@ export const repositories = pgTable("repositories", {
   stargazersCount: integer("stargazers_count").notNull().default(0),
   watchersCount: integer("watchers_count").notNull().default(0),
 });
-const repositoriesSchema = createInsertSchema(repositories);
+const repositoriesSchema = createSelectSchema(repositories);
 export type Repository = z.infer<typeof repositoriesSchema>;
 
 export const users = pgTable("users", {
@@ -27,7 +27,7 @@ export const users = pgTable("users", {
   name: text("name"),
   twitterHandle: text("twitter_handle"),
 });
-const usersSchema = createInsertSchema(users);
+const usersSchema = createSelectSchema(users);
 export type User = z.infer<typeof usersSchema>;
 
 export const events = pgTable("events", {
@@ -45,7 +45,7 @@ export const events = pgTable("events", {
   eventName: text("event_name").notNull(),
   eventAction: text("event_action").notNull(),
 });
-const eventsSchema = createInsertSchema(events);
+const eventsSchema = createSelectSchema(events);
 export type Event = z.infer<typeof eventsSchema>;
 
 export const repositoriesRelations = relations(repositories, ({ many }) => ({

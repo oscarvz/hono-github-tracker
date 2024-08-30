@@ -31,6 +31,11 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     window.history.replaceState(null, "", url.toString());
   }, [repoId, activeTab, repositories]);
 
+  const events =
+    repositories.find(({ id }) => id === repoId)?.events ||
+    repositories.at(0)?.events ||
+    [];
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -61,7 +66,7 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        Events
+        Wow look at all this data, izzit GDPR compliant?
         <Space h="lg" />
         <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
@@ -76,7 +81,7 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
           <Space h="lg" />
 
           <Tabs.Panel value="events">
-            <EventsTable repoId={repoId} repositories={repositories} />
+            <EventsTable events={events} />
           </Tabs.Panel>
 
           <Tabs.Panel value="users">

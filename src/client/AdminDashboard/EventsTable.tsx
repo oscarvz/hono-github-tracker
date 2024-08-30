@@ -1,29 +1,57 @@
-import { Table, type TableData } from "@mantine/core";
-import { useMemo } from "react";
+import { Checkbox, Table } from "@mantine/core";
+import { useState } from "react";
+import type { Event } from "../../db";
 
-import type { AdminDashboardProps } from "../types";
-
-type UsersTableProps = Pick<AdminDashboardProps, "repositories"> & {
-  repoId?: number;
+type EventstableProps = {
+  events: Array<Event>;
 };
 
-export function EventsTable({ repositories, repoId }: UsersTableProps) {
-  const eventsTableData: TableData = useMemo(() => {
-    const events =
-      repositories.find(({ id }) => id === repoId)?.events ||
-      repositories[0].events;
+export function EventsTable({ events }: EventstableProps) {
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-    return {
-      caption: "Events",
-      head: ["User ID", "Date", "Event", "Action"],
-      body: events.map(({ userId, createdAt, eventAction, eventName }) => {
-        const date = createdAt ? new Date(createdAt).toDateString() : "";
-        return [userId, date, eventName, eventAction];
-      }),
-    };
-  }, [repoId, repositories]);
+  const rows = events.map(
+    ({ id, eventName, eventAction, createdAt, userId }) => (
+      <Table.Tr
+        key={id}
+        bg={
+          selectedRows.includes(id)
+            ? "var(--mantine-color-blue-light)"
+            : undefined
+        }
+      >
+        <Table.Td>
+          <Checkbox
+            aria-label="Select row"
+            checked={selectedRows.includes(id)}
+            onChange={(event) =>
+              setSelectedRows(
+                event.currentTarget.checked
+                  ? [...selectedRows, id]
+                  : selectedRows.filter((selectedId) => selectedId !== id),
+              )
+            }
+          />
+        </Table.Td>
+        <Table.Td>{userId}</Table.Td>
+        <Table.Td>{new Date(createdAt).toDateString()}</Table.Td>
+        <Table.Td>{eventName}</Table.Td>
+        <Table.Td>{eventAction}</Table.Td>
+      </Table.Tr>
+    ),
+  );
 
   return (
-    <Table data={eventsTableData} striped highlightOnHover withTableBorder />
+    <Table striped highlightOnHover withTableBorder>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th />
+          <Table.Th>User ID</Table.Th>
+          <Table.Th>Date</Table.Th>
+          <Table.Th>Event</Table.Th>
+          <Table.Th>Action</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>{rows}</Table.Tbody>
+    </Table>
   );
 }
