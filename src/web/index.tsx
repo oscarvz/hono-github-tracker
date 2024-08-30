@@ -31,10 +31,27 @@ web.get("/admin", async (c) => {
 
   const db = c.var.db;
 
-  const repositories = await db.query.repositories.findMany({
+  const repositoriesWithEvents = await db.query.repositories.findMany({
     with: {
       events: true,
     },
+  });
+
+  const users = await db.query.users.findMany({
+    with: {
+      events: true,
+    },
+  });
+
+  const repositories = repositoriesWithEvents.map((repo) => {
+    const usersForRepo = users.filter(({ id }) =>
+      repo.events.some(({ userId }) => userId === id),
+    );
+
+    return {
+      ...repo,
+      users: usersForRepo,
+    };
   });
 
   let parsedRepoId: number | undefined;

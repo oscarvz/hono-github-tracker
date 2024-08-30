@@ -1,4 +1,4 @@
-import type { Event, Repository } from "../db";
+import type { Event, Repository, User } from "../db";
 
 export type DashboardProps = {
   repositories: Array<
@@ -12,6 +12,7 @@ export type AdminDashboardProps = {
   repositories: Array<
     Repository & {
       events: Array<Event>;
+      users: Array<User>;
     }
   >;
   params?: {

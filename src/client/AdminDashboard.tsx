@@ -2,6 +2,7 @@ import {
   AppShell,
   Group,
   NavLink,
+  Space,
   Table,
   type TableData,
   Tabs,
@@ -54,11 +55,49 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     };
   }, [repoId, repositories]);
 
+  const usersTableData: TableData = useMemo(() => {
+    const users =
+      repositories.find(({ id }) => id === repoId)?.users ||
+      repositories[0].users;
+
+    return {
+      caption: "Users",
+      head: [
+        "Company",
+        "Email",
+        "Handle",
+        "Location",
+        "Name",
+        "Role",
+        "Twitter",
+      ],
+      body: users.map(
+        ({
+          company,
+          emailAddress,
+          handle,
+          location,
+          name,
+          role,
+          twitterHandle,
+        }) => [
+          company,
+          emailAddress,
+          handle,
+          location,
+          name,
+          role,
+          twitterHandle,
+        ],
+      ),
+    };
+  }, [repoId, repositories]);
+
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{ width: 300, breakpoint: "sm" }}
-      padding="md"
+      padding="lg"
     >
       <AppShell.Header>
         <Group h="100%" px="md">
@@ -83,6 +122,7 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
 
       <AppShell.Main>
         Events
+        <Space h="lg" />
         <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
             <Tabs.Tab key="events" value="events">
@@ -93,6 +133,8 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
             </Tabs.Tab>
           </Tabs.List>
 
+          <Space h="lg" />
+
           <Tabs.Panel value="events">
             <Table
               data={eventsTableData}
@@ -102,7 +144,14 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
             />
           </Tabs.Panel>
 
-          <Tabs.Panel value="users">HELLO USERS</Tabs.Panel>
+          <Tabs.Panel value="users">
+            <Table
+              data={usersTableData}
+              striped
+              highlightOnHover
+              withTableBorder
+            />
+          </Tabs.Panel>
         </Tabs>
       </AppShell.Main>
     </AppShell>
