@@ -1,20 +1,13 @@
-import {
-  AppShell,
-  Group,
-  NavLink,
-  Space,
-  Table,
-  type TableData,
-  Tabs,
-  Text,
-} from "@mantine/core";
+import { AppShell, Group, NavLink, Space, Tabs, Text } from "@mantine/core";
 import { IconBrandGithub } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { AdminDashboardProps } from "./types";
+import type { AdminDashboardProps } from "../types";
+import { EventsTable } from "./EventsTable";
+import { UsersTable } from "./UsersTable";
 
 export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
-  const [repoId, setRepoId] = useState(params?.repoId || null);
+  const [repoId, setRepoId] = useState(params?.repoId);
   const [activeTab, setActiveTab] = useState<string | null>(
     params?.activeTab || "events",
   );
@@ -38,59 +31,6 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     window.history.replaceState(null, "", url.toString());
   }, [repoId, activeTab, repositories]);
 
-  const eventsTableData: TableData = useMemo(() => {
-    const events =
-      repositories.find(({ id }) => id === repoId)?.events ||
-      repositories[0].events;
-
-    return {
-      caption: "Events",
-      head: ["User ID", "Date", "Event", "Action"],
-      body: events.map(({ userId, createdAt, eventAction, eventName }) => {
-        const date = createdAt ? new Date(createdAt).toDateString() : "unknown";
-        return [userId, date, eventName, eventAction];
-      }),
-    };
-  }, [repoId, repositories]);
-
-  const usersTableData: TableData = useMemo(() => {
-    const users =
-      repositories.find(({ id }) => id === repoId)?.users ||
-      repositories[0].users;
-
-    return {
-      caption: "Users",
-      head: [
-        "Company",
-        "Email",
-        "Handle",
-        "Location",
-        "Name",
-        "Role",
-        "Twitter",
-      ],
-      body: users.map(
-        ({
-          company,
-          emailAddress,
-          handle,
-          location,
-          name,
-          role,
-          twitterHandle,
-        }) => [
-          company,
-          emailAddress,
-          handle,
-          location,
-          name,
-          role,
-          twitterHandle,
-        ],
-      ),
-    };
-  }, [repoId, repositories]);
-
   return (
     <AppShell
       header={{ height: 60 }}
@@ -107,13 +47,15 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
 
       <AppShell.Navbar p="md">
         Repositories
+        <Space h="lg" />
         {repositories.map(({ fullName, id }) => (
           <NavLink
             key={id}
             label={fullName}
             leftSection={<IconBrandGithub size="1rem" stroke={1.5} />}
-            variant="subtle"
+            variant="light"
             active={id === repoId}
+            onClick={() => setRepoId(id)}
           />
         ))}
       </AppShell.Navbar>
@@ -134,21 +76,11 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
           <Space h="lg" />
 
           <Tabs.Panel value="events">
-            <Table
-              data={eventsTableData}
-              striped
-              highlightOnHover
-              withTableBorder
-            />
+            <EventsTable repoId={repoId} repositories={repositories} />
           </Tabs.Panel>
 
           <Tabs.Panel value="users">
-            <Table
-              data={usersTableData}
-              striped
-              highlightOnHover
-              withTableBorder
-            />
+            <UsersTable repoId={repoId} repositories={repositories} />
           </Tabs.Panel>
         </Tabs>
       </AppShell.Main>
