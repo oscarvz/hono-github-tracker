@@ -9,7 +9,7 @@ import { UsersTable } from "./UsersTable";
 export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
   const [repoId, setRepoId] = useState(params?.repoId);
   const [activeTab, setActiveTab] = useState<string | null>(
-    params?.activeTab || "events",
+    params?.activeTab || "users",
   );
 
   useEffect(() => {
@@ -70,22 +70,22 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
         <Space h="lg" />
         <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
-            <Tabs.Tab key="events" value="events">
-              Events
-            </Tabs.Tab>
             <Tabs.Tab key="users" value="users">
               Users
+            </Tabs.Tab>
+            <Tabs.Tab key="events" value="events">
+              Events
             </Tabs.Tab>
           </Tabs.List>
 
           <Space h="lg" />
 
-          <Tabs.Panel value="events">
-            <EventsTable events={events} />
-          </Tabs.Panel>
-
           <Tabs.Panel value="users">
             <UsersTable repoId={repoId} repositories={repositories} />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="events">
+            <EventsTable events={events} />
           </Tabs.Panel>
         </Tabs>
       </AppShell.Main>

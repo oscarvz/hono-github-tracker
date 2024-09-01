@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 
+import { eq } from "drizzle-orm";
 import { events, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
@@ -81,4 +82,21 @@ api.post("/ghwh", async (c) => {
   );
 });
 
+const eventsApi = new Hono<HonoEnv>().delete("/:id", async (c) => {
+  const db = c.var.db;
+  const eventIdParam = c.req.param("id");
+  const eventId = Number.parseInt(eventIdParam, 10);
+
+  try {
+    await db.delete(events).where(eq(events.id, eventId));
+    return c.text("Event deleted", 200);
+  } catch (error) {
+    return c.text(`Error deleting event: ${error}`, 500);
+  }
+});
+
+api.route("/events", eventsApi);
+
 export default api;
+
+export type EventsApi = typeof eventsApi;

@@ -20,7 +20,7 @@ export function Dashboard({ repositories }: DashboardProps) {
       </AppShell.Header>
 
       <AppShell.Main>
-        <Grid>
+        <Grid align="stretch">
           {repositories.map(
             ({
               description,
@@ -29,8 +29,8 @@ export function Dashboard({ repositories }: DashboardProps) {
               stargazersCount,
               watchersCount,
             }) => (
-              <GridCol key={fullName} span="content">
-                <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <GridCol key={fullName} span={4}>
+                <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
                   <Text fw={500}>{fullName}</Text>
 
                   {description && (
