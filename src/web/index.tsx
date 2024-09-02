@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import type { AdminDashboardProps, DashboardProps } from "../client";
 import { App } from "../client/App";
+import type { User } from "../db";
 import { reactRendererMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -26,44 +27,50 @@ web.get("/", async (c) => {
 
 // TODO: Add authentication middleware
 web.get("/admin", async (c) => {
-  const repoId = c.req.query("repoId");
-  const activeTab = c.req.query("activeTab");
-
   const db = c.var.db;
+  const repoIdParam = c.req.query("repoId");
+  const activeTabParam = c.req.query("activeTab");
 
-  const repositoriesWithEvents = await db.query.repositories.findMany({
-    with: {
-      events: true,
-    },
-  });
+  let storedRepositories: AdminDashboardProps["repositories"] = [];
 
-  const users = await db.query.users.findMany({
-    with: {
-      events: true,
-    },
-  });
+  const repoId = repoIdParam
+    ? Number.parseInt(repoIdParam, 10)
+    : await db.query.repositories
+        .findFirst({ columns: { id: true } })
+        .then((repo) => repo?.id);
 
-  const repositories = repositoriesWithEvents.map((repo) => {
-    const usersForRepo = users.filter(({ id }) =>
-      repo.events.some(({ userId }) => userId === id),
-    );
-
-    return {
-      ...repo,
-      users: usersForRepo,
-    };
-  });
-
-  let parsedRepoId: number | undefined;
   if (repoId) {
-    parsedRepoId = Number.parseInt(repoId, 10);
+    const repositoriesWithEvents = await db.query.repositories.findMany({
+      columns: {
+        id: true,
+        fullName: true,
+      },
+      with: {
+        events: {
+          where: (events, { eq }) => eq(events.repoId, repoId),
+          with: { user: true },
+        },
+      },
+    });
+
+    storedRepositories = repositoriesWithEvents.map((repository) => {
+      const users = repository.events.reduce<Array<User>>((users, { user }) => {
+        const containsUser = users.some(({ id }) => id === user.id);
+        return containsUser ? users : users.concat(user);
+      }, []);
+
+      return {
+        ...repository,
+        users,
+      };
+    });
   }
 
   const props: AdminDashboardProps = {
-    repositories,
+    repositories: storedRepositories,
     params: {
-      repoId: parsedRepoId,
-      activeTab,
+      repoId,
+      activeTab: activeTabParam,
     },
   };
 

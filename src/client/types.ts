@@ -10,7 +10,7 @@ export type DashboardProps = {
 
 export type AdminDashboardProps = {
   repositories: Array<
-    Repository & {
+    Pick<Repository, "id" | "fullName"> & {
       events: Array<Event>;
       users: Array<User>;
     }
