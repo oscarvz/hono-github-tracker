@@ -15,9 +15,12 @@ const getter = repositoriesClient[":id"].$get;
 function getReposWithEvents(params: InferRequestType<typeof getter>) {
   return async () => {
     try {
-      const reposWithEvents = await getter(params);
-      const events = await reposWithEvents.json();
-      return events;
+      const response = await getter(params);
+      /* biome-ignore lint/suspicious/noExplicitAny: HACK: `createdAt` doesn't
+         get inferred correctly
+      */
+      const parsedRepos: any = await response.json();
+      return parsedRepos as Pick<AdminDashboardProps, "repositories">;
     } catch (error) {
       console.error("Error fetching events: ", error);
     }
