@@ -1,4 +1,5 @@
-import type { Event, Repository, User } from "../db";
+import type { Repository } from "../db";
+import type { RepositoriesWithEvents } from "../types";
 
 export type DashboardProps = {
   repositories: Array<
@@ -9,12 +10,7 @@ export type DashboardProps = {
 };
 
 export type AdminDashboardProps = {
-  repositories: Array<
-    Pick<Repository, "id" | "fullName"> & {
-      events: Array<Event>;
-      users: Array<User>;
-    }
-  >;
+  repositories: RepositoriesWithEvents;
   params?: {
     repoId?: number;
     activeTab?: string;

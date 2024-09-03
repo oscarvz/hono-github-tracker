@@ -82,6 +82,19 @@ api.post("/ghwh", async (c) => {
   );
 });
 
+const repoApi = new Hono<HonoEnv>().get("/:id", async (c) => {
+  const getRepositoriesWithEvents = c.var.getRepositoriesWithEvents;
+  const repoIdParam = c.req.param("id");
+  const repoId = Number.parseInt(repoIdParam, 10);
+
+  try {
+    const repositories = await getRepositoriesWithEvents(repoId);
+    return c.json({ repositories }, 200);
+  } catch (error) {
+    return c.text(`Error fetching repository: ${error}`, 500);
+  }
+});
+
 const eventsApi = new Hono<HonoEnv>().delete("/:id", async (c) => {
   const db = c.var.db;
   const eventIdParam = c.req.param("id");
@@ -95,8 +108,10 @@ const eventsApi = new Hono<HonoEnv>().delete("/:id", async (c) => {
   }
 });
 
+api.route("/repositories", repoApi);
 api.route("/events", eventsApi);
 
 export default api;
 
+export type RepoApi = typeof repoApi;
 export type EventsApi = typeof eventsApi;

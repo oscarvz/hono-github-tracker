@@ -2,9 +2,8 @@ import { Hono } from "hono";
 
 import type { AdminDashboardProps, DashboardProps } from "../client";
 import { App } from "../client/App";
-import type { User } from "../db";
 import { reactRendererMiddleware } from "../middleware";
-import type { HonoEnv } from "../types";
+import type { HonoEnv, RepositoriesWithEvents } from "../types";
 
 const web = new Hono<HonoEnv>();
 
@@ -28,10 +27,11 @@ web.get("/", async (c) => {
 // TODO: Add authentication middleware
 web.get("/admin", async (c) => {
   const db = c.var.db;
+  const getRepositoriesWithEvents = c.var.getRepositoriesWithEvents;
   const repoIdParam = c.req.query("repoId");
   const activeTabParam = c.req.query("activeTab");
 
-  let storedRepositories: AdminDashboardProps["repositories"] = [];
+  let storedRepositories: RepositoriesWithEvents = [];
 
   const repoId = repoIdParam
     ? Number.parseInt(repoIdParam, 10)
@@ -40,30 +40,7 @@ web.get("/admin", async (c) => {
         .then((repo) => repo?.id);
 
   if (repoId) {
-    const repositoriesWithEvents = await db.query.repositories.findMany({
-      columns: {
-        id: true,
-        fullName: true,
-      },
-      with: {
-        events: {
-          where: (events, { eq }) => eq(events.repoId, repoId),
-          with: { user: true },
-        },
-      },
-    });
-
-    storedRepositories = repositoriesWithEvents.map((repository) => {
-      const users = repository.events.reduce<Array<User>>((users, { user }) => {
-        const containsUser = users.some(({ id }) => id === user.id);
-        return containsUser ? users : users.concat(user);
-      }, []);
-
-      return {
-        ...repository,
-        users,
-      };
-    });
+    storedRepositories = await getRepositoriesWithEvents(repoId);
   }
 
   const props: AdminDashboardProps = {
