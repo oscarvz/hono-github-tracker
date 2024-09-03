@@ -1,31 +1,12 @@
 import { AppShell, Group, NavLink, Space, Tabs, Text } from "@mantine/core";
 import { IconBrandGithub } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { type InferRequestType, hc } from "hono/client";
 import { useEffect, useState } from "react";
 
-import type { RepoApi } from "../../api";
 import type { AdminDashboardProps } from "../types";
 import { EventsTable } from "./EventsTable";
 import { UsersTable } from "./UsersTable";
-
-const repositoriesClient = hc<RepoApi>("/api/repositories");
-const getter = repositoriesClient[":id"].$get;
-
-function getReposWithEvents(params: InferRequestType<typeof getter>) {
-  return async () => {
-    try {
-      const response = await getter(params);
-      /* biome-ignore lint/suspicious/noExplicitAny: HACK: `createdAt` doesn't
-         get inferred correctly
-      */
-      const parsedRepos: any = await response.json();
-      return parsedRepos as Pick<AdminDashboardProps, "repositories">;
-    } catch (error) {
-      console.error("Error fetching events: ", error);
-    }
-  };
-}
+import { getReposWithEvents } from "./rpc";
 
 export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
   const [repoId, setRepoId] = useState(params?.repoId || repositories[0].id);
@@ -36,6 +17,8 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     queryFn: getReposWithEvents({ param: { id: repoId?.toString() || "" } }),
     initialData: { repositories },
     staleTime: (query) => {
+      // TODO: Fix for setting stale time properly. It currently fetches too
+      // when the tab is changed - though the data already exists
       const activeRepo = query.state.data?.repositories.find(
         ({ id }) => id === repoId,
       );
