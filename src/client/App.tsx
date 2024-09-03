@@ -1,12 +1,15 @@
 import { MantineProvider } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@mantine/core/styles.css";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { AdminDashboard } from "./AdminDashboard";
 import { Dashboard } from "./Dashboard";
 import type { ClientComponent } from "./types";
 
 export function App(props: ClientComponent) {
+  const queryClient = useRef(new QueryClient());
+
   // Remove the data-props attribute after hydration
   useEffect(() => {
     const rootElement = document.getElementById("root");
@@ -14,9 +17,11 @@ export function App(props: ClientComponent) {
   }, []);
 
   return (
-    <MantineProvider defaultColorScheme="auto">
-      <Component {...props} />
-    </MantineProvider>
+    <QueryClientProvider client={queryClient.current}>
+      <MantineProvider defaultColorScheme="auto">
+        <Component {...props} />
+      </MantineProvider>
+    </QueryClientProvider>
   );
 }
 

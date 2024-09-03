@@ -23,6 +23,7 @@
     "@octokit/core": "^6.1.2",
     "@octokit/webhooks": "^13.3.0",
     "@tabler/icons-react": "^3.14.0",
+    "@tanstack/react-query": "^5.53.3",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",

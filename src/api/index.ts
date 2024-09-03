@@ -1,6 +1,8 @@
-import { Hono } from "hono";
-
+import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import { z } from "zod";
+
 import { events, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
@@ -82,31 +84,39 @@ api.post("/ghwh", async (c) => {
   );
 });
 
-const repoApi = new Hono<HonoEnv>().get("/:id", async (c) => {
-  const getRepositoriesWithEvents = c.var.getRepositoriesWithEvents;
-  const repoIdParam = c.req.param("id");
-  const repoId = Number.parseInt(repoIdParam, 10);
+const repoApi = new Hono<HonoEnv>().get(
+  "/:id",
+  zValidator("param", z.object({ id: z.string() })),
+  async (c) => {
+    const getRepositoriesWithEvents = c.var.getRepositoriesWithEvents;
+    const repoIdParam = c.req.param("id");
+    const repoId = Number.parseInt(repoIdParam, 10);
 
-  try {
-    const repositories = await getRepositoriesWithEvents(repoId);
-    return c.json({ repositories }, 200);
-  } catch (error) {
-    return c.text(`Error fetching repository: ${error}`, 500);
-  }
-});
+    try {
+      const repositories = await getRepositoriesWithEvents(repoId);
+      return c.json({ repositories }, 200);
+    } catch (error) {
+      return c.text(`Error fetching repository: ${error}`, 500);
+    }
+  },
+);
 
-const eventsApi = new Hono<HonoEnv>().delete("/:id", async (c) => {
-  const db = c.var.db;
-  const eventIdParam = c.req.param("id");
-  const eventId = Number.parseInt(eventIdParam, 10);
+const eventsApi = new Hono<HonoEnv>().delete(
+  "/:id",
+  zValidator("param", z.object({ id: z.string() })),
+  async (c) => {
+    const db = c.var.db;
+    const eventIdParam = c.req.param("id");
+    const eventId = Number.parseInt(eventIdParam, 10);
 
-  try {
-    await db.delete(events).where(eq(events.id, eventId));
-    return c.text("Event deleted", 200);
-  } catch (error) {
-    return c.text(`Error deleting event: ${error}`, 500);
-  }
-});
+    try {
+      await db.delete(events).where(eq(events.id, eventId));
+      return c.text("Event deleted", 200);
+    } catch (error) {
+      return c.text(`Error deleting event: ${error}`, 500);
+    }
+  },
+);
 
 api.route("/repositories", repoApi);
 api.route("/events", eventsApi);
