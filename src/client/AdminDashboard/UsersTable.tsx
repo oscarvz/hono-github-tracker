@@ -1,18 +1,14 @@
 import { Table, type TableData } from "@mantine/core";
 import { useMemo } from "react";
 
-import type { AdminDashboardProps } from "../types";
+import type { User } from "../../db";
 
-type UsersTableProps = Pick<AdminDashboardProps, "repositories"> & {
-  repoId?: number;
+type UsersTableProps = {
+  users: Array<User>;
 };
 
-export function UsersTable({ repoId, repositories }: UsersTableProps) {
-  const usersTableData: TableData = useMemo(() => {
-    const users =
-      repositories.find(({ id }) => id === repoId)?.users ||
-      repositories[0].users;
-
+export function UsersTable({ users }: UsersTableProps) {
+  const usersTableData: TableData | undefined = useMemo(() => {
     return {
       caption: "Users",
       head: [
@@ -44,7 +40,7 @@ export function UsersTable({ repoId, repositories }: UsersTableProps) {
         ],
       ),
     };
-  }, [repoId, repositories]);
+  }, [users]);
 
   return (
     <Table data={usersTableData} striped highlightOnHover withTableBorder />

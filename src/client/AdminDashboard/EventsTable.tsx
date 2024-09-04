@@ -1,4 +1,4 @@
-import { Checkbox, Table } from "@mantine/core";
+import { Button, Checkbox, Table } from "@mantine/core";
 import { hc } from "hono/client";
 import { useState } from "react";
 
@@ -10,15 +10,16 @@ type EventstableProps = {
 };
 
 const eventsClient = hc<EventsApi>("/api/events");
+const eventDeleter = eventsClient[":id"].$delete;
 
 export function EventsTable({ events }: EventstableProps) {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-  const handleOnDelete = async (id: number) => {
+  // TODO: Add Tanstack Query mutation handler
+  const deleteEvent = async (eventId: Event["id"]) => {
+    const id = eventId.toString();
     try {
-      await eventsClient[":id"].$delete({
-        param: { id: id.toString() },
-      });
+      await eventDeleter({ param: { id } });
     } catch (error) {
       console.error("Error deleting event: ", error);
     }
@@ -52,9 +53,15 @@ export function EventsTable({ events }: EventstableProps) {
         <Table.Td>{eventName}</Table.Td>
         <Table.Td>{eventAction}</Table.Td>
         <Table.Td>
-          <button type="button" onClick={() => handleOnDelete(id)}>
-            delete
-          </button>
+          <Button
+            variant="outline"
+            color="red"
+            size="compact-xs"
+            radius="xs"
+            onClick={() => deleteEvent(id)}
+          >
+            Delete
+          </Button>
         </Table.Td>
       </Table.Tr>
     ),
@@ -64,7 +71,7 @@ export function EventsTable({ events }: EventstableProps) {
     <Table striped highlightOnHover withTableBorder>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th />
+          <Table.Th /> {/* TODO: Checkbox to handle event actions */}
           <Table.Th>User ID</Table.Th>
           <Table.Th>Date</Table.Th>
           <Table.Th>Event</Table.Th>

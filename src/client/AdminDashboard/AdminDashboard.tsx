@@ -1,4 +1,5 @@
 import { AppShell, Group, NavLink, Space, Tabs, Text } from "@mantine/core";
+import { usePrevious } from "@mantine/hooks";
 import { IconBrandGithub } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -6,27 +7,26 @@ import { useEffect, useState } from "react";
 import type { AdminDashboardProps } from "../types";
 import { EventsTable } from "./EventsTable";
 import { UsersTable } from "./UsersTable";
+import { REPOS } from "./constants";
 import { getReposWithEvents } from "./rpc";
 
 export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
   const [repoId, setRepoId] = useState(params?.repoId || repositories[0].id);
   const [activeTab, setActiveTab] = useState(params?.activeTab || "users");
+  const previousRepoId = usePrevious(repoId);
 
   const { data } = useQuery({
-    queryKey: ["repos", activeTab, repoId],
-    queryFn: getReposWithEvents({ param: { id: repoId?.toString() || "" } }),
+    queryKey: [REPOS, repoId],
+    queryFn: getReposWithEvents(repoId?.toString()),
     initialData: { repositories },
     staleTime: (query) => {
-      // TODO: Fix for setting stale time properly. It currently fetches too
-      // when the tab is changed - though the data already exists
-      const activeRepo = query.state.data?.repositories.find(
-        ({ id }) => id === repoId,
-      );
+      const fiveMinutes = 60 * 5 * 1000;
+      if (!previousRepoId) {
+        return fiveMinutes;
+      }
 
-      const hasEmptyData =
-        activeRepo?.events.length === 0 || activeRepo?.users.length === 0;
-
-      return hasEmptyData ? 0 : 60 * 1000;
+      const isSameRepo = query.queryKey.includes(previousRepoId);
+      return isSameRepo ? fiveMinutes : 0;
     },
   });
 
@@ -44,10 +44,13 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
     window.history.replaceState(null, "", url.toString());
   }, [repoId, activeTab]);
 
+  const users =
+    data?.repositories.find(({ id }) => id === repoId)?.users ||
+    data?.repositories.at(0)?.users;
+
   const events =
     data?.repositories.find(({ id }) => id === repoId)?.events ||
-    data?.repositories.at(0)?.events ||
-    [];
+    data?.repositories.at(0)?.events;
 
   return (
     <AppShell
@@ -98,14 +101,11 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
           <Space h="lg" />
 
           <Tabs.Panel value="users">
-            <UsersTable
-              repoId={repoId}
-              repositories={data?.repositories || []}
-            />
+            {users && <UsersTable users={users} />}
           </Tabs.Panel>
 
           <Tabs.Panel value="events">
-            <EventsTable events={events} />
+            {events && <EventsTable events={events} />}
           </Tabs.Panel>
         </Tabs>
       </AppShell.Main>
