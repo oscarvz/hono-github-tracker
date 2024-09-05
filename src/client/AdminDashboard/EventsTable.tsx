@@ -1,29 +1,15 @@
 import { Button, Checkbox, Table } from "@mantine/core";
-import { hc } from "hono/client";
 import { useState } from "react";
 
-import type { EventsApi } from "../../api";
 import type { Event } from "../../db";
+import { deleteEvent } from "./rpc";
 
 type EventstableProps = {
   events: Array<Event>;
 };
 
-const eventsClient = hc<EventsApi>("/api/events");
-const eventDeleter = eventsClient[":id"].$delete;
-
 export function EventsTable({ events }: EventstableProps) {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  // TODO: Add Tanstack Query mutation handler
-  const deleteEvent = async (eventId: Event["id"]) => {
-    const id = eventId.toString();
-    try {
-      await eventDeleter({ param: { id } });
-    } catch (error) {
-      console.error("Error deleting event: ", error);
-    }
-  };
 
   const rows = events.map(
     ({ id, eventName, eventAction, createdAt, userId }) => (

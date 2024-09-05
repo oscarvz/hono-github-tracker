@@ -1,6 +1,7 @@
 import { type InferRequestType, hc } from "hono/client";
 
-import type { RepoApi } from "../../api";
+import type { EventsApi, RepoApi } from "../../api";
+import type { Event } from "../../db";
 import type { AdminDashboardProps } from "../types";
 
 const repositoriesClient = hc<RepoApi>("/api/repositories");
@@ -13,10 +14,10 @@ export function getReposWithEvents(
     try {
       const response = await repositoriesGetter({ param: { id } });
       /*
-        biome-ignore lint/suspicious/noExplicitAny: HACK: `createdAt` doesn't
-        get inferred correctly: it returns it as a string instead of a Date.
-        Though, it technically is a string after parsing JSON, it breaks the
-        general type sharing of the schema for front- and back-end.
+      biome-ignore lint/suspicious/noExplicitAny: HACK: `createdAt` doesn't
+      get inferred correctly: it returns it as a string instead of a Date.
+      Though, it technically is a string after parsing JSON, it breaks the
+      general type sharing of the schema for front- and back-end.
       */
       const repositories: any = await response.json();
       return repositories as Pick<AdminDashboardProps, "repositories">;
@@ -24,4 +25,16 @@ export function getReposWithEvents(
       console.error("Error fetching events: ", error);
     }
   };
+}
+
+const eventsClient = hc<EventsApi>("/api/events");
+const eventDeleter = eventsClient[":id"].$delete;
+
+export async function deleteEvent(eventId: Event["id"]) {
+  const id = eventId.toString();
+  try {
+    await eventDeleter({ param: { id } });
+  } catch (error) {
+    console.error("Error deleting event: ", error);
+  }
 }
