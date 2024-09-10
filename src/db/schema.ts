@@ -66,3 +66,6 @@ export const eventsRelations = relations(events, ({ one }) => ({
     references: [repositories.id],
   }),
 }));
+
+export type UserInsert = typeof users.$inferInsert;
+export type EventInsert = typeof events.$inferInsert;

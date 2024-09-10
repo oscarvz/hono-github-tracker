@@ -11,12 +11,14 @@ type Variables = {
   db: Db;
   getRepositoriesWithEvents: GetRepositoriesWithEvents;
   fetchUserById: FetchUserById;
+  fetchUsersWithInteractions: FetchUsersWithInteractions;
 };
 
 type EnvVars = {
   DATABASE_URL: string;
   GITHUB_API_TOKEN: string;
   GITHUB_WEBHOOK_SECRET: string;
+  GITHUB_BEARER_TOKEN: string;
 };
 
 export type HonoEnv = {
@@ -38,17 +40,22 @@ export type RepositoriesWithEvents = Array<
 export type GetRepositoriesWithEvents = (
   id: schema.Repository["id"],
 ) => Promise<RepositoriesWithEvents>;
+export type FetchUsersWithInteractions = ({
+  owner,
+  repo,
+  count,
+}: {
+  owner: string;
+  repo: string;
+  count: number;
+}) => Promise<{
+  repoId: number;
+  stargazers: { users: Array<schema.UserInsert> };
+  watchers: { users: Array<schema.UserInsert> };
+}>;
 
 // Octokit isn't exporting this particular type, so we extract it from the
 // `verifyAndReceive` method.
 export type WebhookEventName = Parameters<
   InstanceType<typeof Webhooks>["verifyAndReceive"]
 >[number]["name"];
-
-// Not the most robust check as we don't have an array available with all the
-// possible event names, but it's enough to keep TS happy.
-export function isWebhookEventName(
-  header: string | undefined,
-): header is WebhookEventName {
-  return !!header;
-}

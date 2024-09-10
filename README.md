@@ -55,7 +55,8 @@ bun studio
 ```
 
 > [!important]
-> When using any proxy tool, make sure to append the URL with `/api/ghwh`
+> When using any proxy tool, make sure to append the URL with
+> `/api/github/webhook`
 
 ## Dashboard
 
@@ -69,4 +70,3 @@ into issues, have questions or suggestions, feel free to open an issue.
 
 - [ ] [Authenticated dashboard](https://github.com/oscarvz/hono-github-tracker/issues/14):
       we shouldn't expose the dashboard to the public.
-      s
