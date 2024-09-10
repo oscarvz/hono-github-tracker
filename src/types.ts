@@ -38,6 +38,7 @@ export type FetchUsersWithInteractions = ({
   repo: string;
   count: number;
 }) => Promise<{
+  repoId: number;
   stargazers: { users: Array<schema.UserInsert> };
   watchers: { users: Array<schema.UserInsert> };
 }>;

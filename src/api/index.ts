@@ -1,7 +1,8 @@
-import { Hono } from "hono";
+import { and, eq } from "drizzle-orm";
+import { type Context, Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 
-import { events, repositories, users } from "../db";
+import { events, type EventInsert, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -86,7 +87,8 @@ api.post("/github/webhook", async (c) => {
 api.get(
   "/github/:owner/:repo",
   bearerAuth({
-    verifyToken: async (token, c) => token === c.env.GITHUB_BEARER_TOKEN,
+    verifyToken: async (token, c: Context<HonoEnv>) =>
+      token === c.env.GITHUB_BEARER_TOKEN,
   }),
   async (c) => {
     const db = c.var.db;
@@ -101,16 +103,60 @@ api.get(
     }
 
     try {
-      const { stargazers, watchers } = await fetchUsersWithInteractions({
-        count,
-        owner,
-        repo,
-      });
+      const { stargazers, watchers, repoId } = await fetchUsersWithInteractions(
+        {
+          count,
+          owner,
+          repo,
+        },
+      );
 
       const usersWithInteractions = stargazers.users.concat(watchers.users);
       await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
         target: users.id,
       });
+
+      const stargazerEvents: Array<EventInsert> = stargazers.users.map(
+        (user) => ({
+          eventName: "star",
+          eventAction: "created",
+          repoId,
+          userId: user.id,
+        }),
+      );
+      if (stargazerEvents.length > 0) {
+        await db
+          .insert(events)
+          .values(stargazerEvents)
+          .onConflictDoNothing({
+            target: users.id,
+            where: and(
+              eq(events.eventName, "star"),
+              eq(events.eventAction, "created"),
+              eq(events.repoId, repoId),
+            ),
+          });
+      }
+
+      const watcherEvents: Array<EventInsert> = watchers.users.map((user) => ({
+        eventName: "watch",
+        eventAction: "started",
+        repoId,
+        userId: user.id,
+      }));
+      if (watcherEvents.length > 0) {
+        await db
+          .insert(events)
+          .values(watcherEvents)
+          .onConflictDoNothing({
+            target: users.id,
+            where: and(
+              eq(events.eventName, "watch"),
+              eq(events.eventAction, "started"),
+              eq(events.repoId, repoId),
+            ),
+          });
+      }
 
       return c.text("Updated stargazers and watchers!");
     } catch (error) {

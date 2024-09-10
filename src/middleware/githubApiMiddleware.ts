@@ -38,6 +38,7 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
           `
             query lastUsersWithInteractions($owner: String!, $repo: String!, $count: Int!) {
               repository(owner: $owner, name: $repo) {
+                repoId: databaseId,
                 stargazers(last: $count) {
                   users: nodes {
                     id: databaseId,
