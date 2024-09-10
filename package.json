@@ -6,7 +6,7 @@
     "build": "vite build --mode client && vite build",
     "preview": "bun run build && wrangler pages dev",
     "deploy": "$npm_execpath run build && wrangler pages deploy",
-    "studio": "bunx @fiberplane/studio@beta",
+    "studio": "bunx @fiberplane/studio@canary",
     "db:generate": "bun drizzle-kit generate",
     "db:migrate": "bun drizzle-kit migrate",
     "lint": "biome lint",

@@ -1,15 +1,17 @@
-import { Hono } from "hono";
+import { and, eq } from "drizzle-orm";
+import { type Context, Hono } from "hono";
+import { bearerAuth } from "hono/bearer-auth";
 
-import { events, repositories, users } from "../db";
+import { events, type EventInsert, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
 const api = new Hono<HonoEnv>();
 
-api.use("/ghwh", githubApiMiddleware);
-api.use("/ghwh", githubWebhooksMiddleware);
+api.use("/github/*", githubApiMiddleware);
+api.use("/github/webhook", githubWebhooksMiddleware);
 
-api.post("/ghwh", async (c) => {
+api.post("/github/webhook", async (c) => {
   const db = c.var.db;
   const webhooks = c.var.webhooks;
   const fetchUserById = c.var.fetchUserById;
@@ -18,7 +20,6 @@ api.post("/ghwh", async (c) => {
     ["issues.opened", "star.created", "watch.started"],
     async ({ payload, name }) => {
       const userId = payload.sender.id;
-      const user = await fetchUserById(userId);
 
       try {
         await db
@@ -43,6 +44,8 @@ api.post("/ghwh", async (c) => {
       }
 
       try {
+        const user = await fetchUserById(userId);
+
         await db
           .insert(users)
           .values({
@@ -80,5 +83,88 @@ api.post("/ghwh", async (c) => {
     },
   );
 });
+
+api.get(
+  // Params will be replaced by repo id once dashboard is implemented.
+  "/github/:owner/:repo",
+  bearerAuth({
+    // Basic bearer token auth for now until the dashboard is implemented.
+    verifyToken: async (token, c: Context<HonoEnv>) =>
+      token === c.env.GITHUB_BEARER_TOKEN,
+  }),
+  async (c) => {
+    const db = c.var.db;
+    const fetchUsersWithInteractions = c.var.fetchUsersWithInteractions;
+    const owner = c.req.param("owner");
+    const repo = c.req.param("repo");
+
+    const countQuery = c.req.query("count");
+    const count = countQuery ? Number.parseInt(countQuery, 10) : 50;
+
+    try {
+      const { stargazers, watchers, repoId } = await fetchUsersWithInteractions(
+        {
+          count,
+          owner,
+          repo,
+        },
+      );
+
+      const usersWithInteractions = stargazers.users.concat(watchers.users);
+      await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
+        target: users.id,
+      });
+
+      const stargazerEvents: Array<EventInsert> = stargazers.users.map(
+        (user) => ({
+          eventName: "star",
+          eventAction: "created",
+          repoId,
+          userId: user.id,
+        }),
+      );
+      if (stargazerEvents.length > 0) {
+        await db
+          .insert(events)
+          .values(stargazerEvents)
+          .onConflictDoNothing({
+            target: users.id,
+            where: and(
+              eq(events.eventName, "star"),
+              eq(events.eventAction, "created"),
+              eq(events.repoId, repoId),
+            ),
+          });
+      }
+
+      const watcherEvents: Array<EventInsert> = watchers.users.map((user) => ({
+        eventName: "watch",
+        eventAction: "started",
+        repoId,
+        userId: user.id,
+      }));
+      if (watcherEvents.length > 0) {
+        await db
+          .insert(events)
+          .values(watcherEvents)
+          .onConflictDoNothing({
+            target: users.id,
+            where: and(
+              eq(events.eventName, "watch"),
+              eq(events.eventAction, "started"),
+              eq(events.repoId, repoId),
+            ),
+          });
+      }
+
+      return c.text("Updated stargazers and watchers!");
+    } catch (error) {
+      return c.text(
+        `Error fetching and storing users and events: ${error}`,
+        500,
+      );
+    }
+  },
+);
 
 export default api;
