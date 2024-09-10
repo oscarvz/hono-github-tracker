@@ -10,6 +10,7 @@ type Variables = {
   webhooks: Webhooks;
   db: Db;
   fetchUserById: FetchUserById;
+  fetchStarGazers: FetchStargazers;
 };
 
 type EnvVars = {
@@ -24,8 +25,17 @@ export type HonoEnv = {
 };
 
 type GithubUser = Endpoints["GET /users/{username}"]["response"]["data"];
+type Stargazers =
+  Endpoints["GET /repos/{owner}/{repo}/stargazers"]["response"]["data"];
 
 export type FetchUserById = (id: GithubUser["id"]) => Promise<GithubUser>;
+export type FetchStargazers = ({
+  owner,
+  repo,
+}: {
+  owner: string;
+  repo: string;
+}) => Promise<Stargazers>;
 
 // Octokit isn't exporting this particular type, so we extract it from the
 // `verifyAndReceive` method.

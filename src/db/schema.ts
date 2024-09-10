@@ -56,3 +56,4 @@ export const eventsUser = relations(events, ({ one }) => ({
 }));
 
 export type Repository = typeof repositories.$inferSelect;
+export type UserInsert = typeof users.$inferInsert;

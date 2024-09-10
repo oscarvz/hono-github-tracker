@@ -1,7 +1,7 @@
 import { Octokit } from "@octokit/core";
 import { createMiddleware } from "hono/factory";
 
-import type { FetchUserById, HonoEnv } from "../types";
+import type { FetchStargazers, FetchUserById, HonoEnv } from "../types";
 
 let octokitInstance: Octokit | undefined;
 
@@ -22,6 +22,20 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
     const githubToken = c.env.GITHUB_API_TOKEN;
     const octokit = getOctokitInstance(githubToken);
 
+    const fetchStargazers: FetchStargazers = async ({ owner, repo }) => {
+      try {
+        const { data } = await octokit.request(
+          "GET /repos/{owner}/{repo}/stargazers",
+          { owner, repo },
+        );
+
+        console.log("Stargazers", data);
+        return data;
+      } catch (error) {
+        throw new Error(`Github API: error fetching stargazers: ${error}`);
+      }
+    };
+
     const fetchUserById: FetchUserById = async (id) => {
       try {
         const { data } = await octokit.request("GET /user/{id}", { id });
@@ -31,6 +45,7 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
       }
     };
 
+    c.set("fetchStarGazers", fetchStargazers);
     c.set("fetchUserById", fetchUserById);
 
     await next();

@@ -23,19 +23,22 @@ export function Dashboard({ repositories }: DashboardProps) {
         <Grid>
           {repositories.map(
             ({
+              id,
               description,
               fullName,
               latestStar,
               stargazersCount,
               watchersCount,
             }) => (
-              <GridCol key={fullName} span="content">
+              <GridCol key={id} span="content">
                 <Card shadow="sm" padding="lg" radius="md" withBorder>
                   <Text fw={500}>{fullName}</Text>
 
                   {description && (
                     <Text size="sm" c="dimmed">
                       {description}
+                      <br />
+                      {id}
                     </Text>
                   )}
 
