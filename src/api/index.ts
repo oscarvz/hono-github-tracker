@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { bearerAuth } from "hono/bearer-auth";
 
 import { events, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
@@ -6,10 +7,10 @@ import type { HonoEnv } from "../types";
 
 const api = new Hono<HonoEnv>();
 
-api.use("*", githubApiMiddleware);
-api.use("/ghwh", githubWebhooksMiddleware);
+api.use("/github/*", githubApiMiddleware);
+api.use("/github/webhook", githubWebhooksMiddleware);
 
-api.post("/ghwh", async (c) => {
+api.post("/github/webhook", async (c) => {
   const db = c.var.db;
   const webhooks = c.var.webhooks;
   const fetchUserById = c.var.fetchUserById;
@@ -82,34 +83,40 @@ api.post("/ghwh", async (c) => {
   );
 });
 
-api.get("/stargazers/:owner/:repo", async (c) => {
-  const db = c.var.db;
-  const fetchsUsersWithInteractions = c.var.fetchUsersWithInteractions;
-  const owner = c.req.param("owner");
-  const repo = c.req.param("repo");
+api.get(
+  "/github/:owner/:repo",
+  bearerAuth({
+    verifyToken: async (token, c) => token === c.env.GITHUB_BEARER_TOKEN,
+  }),
+  async (c) => {
+    const db = c.var.db;
+    const fetchUsersWithInteractions = c.var.fetchUsersWithInteractions;
+    const owner = c.req.param("owner");
+    const repo = c.req.param("repo");
 
-  let count = 100;
-  const countQuery = c.req.query("count");
-  if (countQuery) {
-    count = Number.parseInt(countQuery, 10);
-  }
+    let count = 100;
+    const countQuery = c.req.query("count");
+    if (countQuery) {
+      count = Number.parseInt(countQuery, 10);
+    }
 
-  try {
-    const { stargazers, watchers } = await fetchsUsersWithInteractions({
-      count,
-      owner,
-      repo,
-    });
+    try {
+      const { stargazers, watchers } = await fetchUsersWithInteractions({
+        count,
+        owner,
+        repo,
+      });
 
-    const usersWithInteractions = stargazers.users.concat(watchers.users);
-    await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
-      target: users.id,
-    });
+      const usersWithInteractions = stargazers.users.concat(watchers.users);
+      await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
+        target: users.id,
+      });
 
-    return c.text("Updated stargazers and watchers!");
-  } catch (error) {
-    return c.text(`Error fetching and storing stargazers: ${error}`, 500);
-  }
-});
+      return c.text("Updated stargazers and watchers!");
+    } catch (error) {
+      return c.text(`Error fetching and storing stargazers: ${error}`, 500);
+    }
+  },
+);
 
 export default api;
