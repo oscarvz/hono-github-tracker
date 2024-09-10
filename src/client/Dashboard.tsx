@@ -37,8 +37,6 @@ export function Dashboard({ repositories }: DashboardProps) {
                   {description && (
                     <Text size="sm" c="dimmed">
                       {description}
-                      <br />
-                      {id}
                     </Text>
                   )}
 

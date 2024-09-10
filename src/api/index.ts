@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { events, type UserInsert, repositories, users } from "../db";
+import { events, repositories, users } from "../db";
 import { githubApiMiddleware, githubWebhooksMiddleware } from "../middleware";
 import type { HonoEnv } from "../types";
 
@@ -84,33 +84,32 @@ api.post("/ghwh", async (c) => {
 
 api.get("/stargazers/:owner/:repo", async (c) => {
   const db = c.var.db;
-  const fetchStarGazers = c.var.fetchStarGazers;
+  const fetchsUsersWithInteractions = c.var.fetchUsersWithInteractions;
   const owner = c.req.param("owner");
   const repo = c.req.param("repo");
 
+  let count = 100;
+  const countQuery = c.req.query("count");
+  if (countQuery) {
+    count = Number.parseInt(countQuery, 10);
+  }
+
   try {
-    const res = await fetchStarGazers({ owner, repo });
+    const { stargazers, watchers } = await fetchsUsersWithInteractions({
+      count,
+      owner,
+      repo,
+    });
 
-    const stargazers = res.reduce<Array<UserInsert>>((users, user) => {
-      if (!("login" in user)) {
-        return users;
-      }
-
-      return users.concat({
-        avatar: user.avatar_url,
-        handle: user.login,
-        id: user.id,
-      });
-    }, []);
-
-    await db.insert(users).values(stargazers).onConflictDoNothing({
+    const usersWithInteractions = stargazers.users.concat(watchers.users);
+    await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
       target: users.id,
     });
+
+    return c.text("Updated stargazers and watchers!");
   } catch (error) {
     return c.text(`Error fetching and storing stargazers: ${error}`, 500);
   }
-
-  return c.text("Fetching stargazers");
 });
 
 export default api;
