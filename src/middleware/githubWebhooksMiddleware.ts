@@ -1,7 +1,7 @@
 import { Webhooks } from "@octokit/webhooks";
 import { createMiddleware } from "hono/factory";
 
-import { type HonoEnv, isWebhookEventName } from "../types";
+import type { HonoEnv, WebhookEventName } from "../types";
 
 let webhooks: Webhooks | undefined;
 
@@ -28,11 +28,10 @@ export const githubWebhooksMiddleware = createMiddleware<HonoEnv, "/ghws">(
 
     const id = c.req.header("x-github-delivery");
     const signature = c.req.header("x-hub-signature-256");
-    const name = c.req.header("x-github-event");
+    const name = c.req.header("x-github-event") as WebhookEventName;
 
-    const isEventName = isWebhookEventName(name);
-    if (!(id && isEventName && signature)) {
-      return c.text("Invalid request", 403);
+    if (!(id && name && signature)) {
+      return c.text("Invalid webhook request", 403);
     }
 
     const payload = await c.req.text();

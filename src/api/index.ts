@@ -85,8 +85,10 @@ api.post("/github/webhook", async (c) => {
 });
 
 api.get(
+  // Params will be replaced by repo id once dashboard is implemented.
   "/github/:owner/:repo",
   bearerAuth({
+    // Basic bearer token auth for now until the dashboard is implemented.
     verifyToken: async (token, c: Context<HonoEnv>) =>
       token === c.env.GITHUB_BEARER_TOKEN,
   }),
@@ -96,11 +98,8 @@ api.get(
     const owner = c.req.param("owner");
     const repo = c.req.param("repo");
 
-    let count = 100;
     const countQuery = c.req.query("count");
-    if (countQuery) {
-      count = Number.parseInt(countQuery, 10);
-    }
+    const count = countQuery ? Number.parseInt(countQuery, 10) : 50;
 
     try {
       const { stargazers, watchers, repoId } = await fetchUsersWithInteractions(
@@ -160,7 +159,10 @@ api.get(
 
       return c.text("Updated stargazers and watchers!");
     } catch (error) {
-      return c.text(`Error fetching and storing stargazers: ${error}`, 500);
+      return c.text(
+        `Error fetching and storing users and events: ${error}`,
+        500,
+      );
     }
   },
 );
