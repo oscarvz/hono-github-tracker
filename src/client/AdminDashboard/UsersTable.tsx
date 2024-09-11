@@ -12,6 +12,7 @@ export function UsersTable({ users }: UsersTableProps) {
     return {
       caption: "Users",
       head: [
+        "#",
         "Handle",
         "Name",
         "Location",
@@ -21,15 +22,19 @@ export function UsersTable({ users }: UsersTableProps) {
         "Company",
       ],
       body: users.map(
-        ({
-          handle,
-          name,
-          location,
-          role,
-          emailAddress,
-          twitterHandle,
-          company,
-        }) => [
+        (
+          {
+            handle,
+            name,
+            location,
+            role,
+            emailAddress,
+            twitterHandle,
+            company,
+          },
+          index,
+        ) => [
+          index + 1,
           handle,
           name,
           location,
@@ -43,6 +48,13 @@ export function UsersTable({ users }: UsersTableProps) {
   }, [users]);
 
   return (
-    <Table data={usersTableData} striped highlightOnHover withTableBorder />
+    <Table
+      data={usersTableData}
+      striped
+      highlightOnHover
+      withTableBorder
+      stickyHeader
+      stickyHeaderOffset={60}
+    />
   );
 }

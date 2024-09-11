@@ -82,7 +82,6 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        Wow look at all this data, izzit GDPR compliant?
         <Space h="lg" />
         <Tabs
           value={activeTab}
