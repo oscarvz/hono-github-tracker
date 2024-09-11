@@ -7,6 +7,8 @@ import {
   timestamp,
   unique,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
+import type { z } from "zod";
 
 export const repositories = pgTable("repositories", {
   id: integer("id").primaryKey(),
@@ -17,6 +19,8 @@ export const repositories = pgTable("repositories", {
   stargazersCount: integer("stargazers_count").notNull().default(0),
   watchersCount: integer("watchers_count").notNull().default(0),
 });
+const repositoriesSchema = createSelectSchema(repositories);
+export type Repository = z.infer<typeof repositoriesSchema>;
 
 export const users = pgTable("users", {
   id: integer("id").primaryKey(),
@@ -30,6 +34,8 @@ export const users = pgTable("users", {
   name: text("name"),
   twitterHandle: text("twitter_handle"),
 });
+const usersSchema = createSelectSchema(users);
+export type User = z.infer<typeof usersSchema>;
 
 export const events = pgTable(
   "events",
@@ -52,23 +58,28 @@ export const events = pgTable(
     uniqueEvent: unique().on(t.userId, t.repoId, t.eventName, t.eventAction),
   }),
 );
+const eventsSchema = createSelectSchema(events);
+export type Event = z.infer<typeof eventsSchema>;
 
-export const repositoriesEvents = relations(repositories, ({ many }) => ({
+export const repositoriesRelations = relations(repositories, ({ many }) => ({
   events: many(events),
 }));
 
-export const usersEvents = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
   events: many(events),
 }));
 
-export const eventsUser = relations(events, ({ one }) => ({
+export const eventsRelations = relations(events, ({ one }) => ({
   user: one(users, {
     fields: [events.userId],
     references: [users.id],
   }),
+  repository: one(repositories, {
+    fields: [events.repoId],
+    references: [repositories.id],
+  }),
 }));
 
-export type Repository = typeof repositories.$inferSelect;
 export type RepositoryInsert = typeof repositories.$inferInsert;
 export type UserInsert = typeof users.$inferInsert;
 export type EventInsert = typeof events.$inferInsert;

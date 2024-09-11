@@ -12,22 +12,27 @@
     "lint": "biome lint",
     "format": "biome format --write",
     "type-check": "tsc",
-    "biome:ci": "biome ci"
+    "biome:ci": "biome ci && bun type-check"
   },
   "dependencies": {
     "@fiberplane/hono-otel": "^0.1.0-beta.11",
     "@hono/react-renderer": "^0.2.1",
     "@mantine/core": "^7.12.1",
+    "@mantine/form": "^7.12.2",
     "@mantine/hooks": "^7.12.1",
     "@neondatabase/serverless": "^0.9.4",
     "@octokit/core": "^6.1.2",
     "@octokit/webhooks": "^13.3.0",
+    "@tabler/icons-react": "^3.14.0",
+    "@tanstack/react-query": "^5.53.3",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
+    "drizzle-zod": "^0.5.1",
     "hono": "^4.5.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
