@@ -94,7 +94,7 @@ api.get(
   }),
   async (c) => {
     const db = c.var.db;
-    const fetchUsersWithInteractions = c.var.fetchUsersWithInteractions;
+    const fetchRepoWithUsersAndEvents = c.var.fetchRepoWithUsersAndEvents;
     const owner = c.req.param("owner");
     const repo = c.req.param("repo");
 
@@ -102,13 +102,33 @@ api.get(
     const count = countQuery ? Number.parseInt(countQuery, 10) : 50;
 
     try {
-      const { stargazers, watchers, repoId } = await fetchUsersWithInteractions(
-        {
-          count,
-          owner,
-          repo,
-        },
-      );
+      const {
+        id,
+        fullName,
+        name,
+        stargazers,
+        watchers,
+        description,
+        stargazersCount,
+      } = await fetchRepoWithUsersAndEvents({
+        count,
+        owner,
+        repo,
+      });
+
+      await db
+        .insert(repositories)
+        .values({
+          fullName,
+          id,
+          name,
+          description,
+          stargazersCount,
+          watchersCount: watchers.totalCount,
+        })
+        .onConflictDoNothing({
+          target: repositories.id,
+        });
 
       const usersWithInteractions = stargazers.users.concat(watchers.users);
       await db.insert(users).values(usersWithInteractions).onConflictDoNothing({
@@ -119,7 +139,7 @@ api.get(
         (user) => ({
           eventName: "star",
           eventAction: "created",
-          repoId,
+          repoId: id,
           userId: user.id,
         }),
       );
@@ -128,11 +148,10 @@ api.get(
           .insert(events)
           .values(stargazerEvents)
           .onConflictDoNothing({
-            target: users.id,
+            target: [repositories.id, users.id],
             where: and(
               eq(events.eventName, "star"),
               eq(events.eventAction, "created"),
-              eq(events.repoId, repoId),
             ),
           });
       }
@@ -140,7 +159,7 @@ api.get(
       const watcherEvents: Array<EventInsert> = watchers.users.map((user) => ({
         eventName: "watch",
         eventAction: "started",
-        repoId,
+        repoId: id,
         userId: user.id,
       }));
       if (watcherEvents.length > 0) {
@@ -148,11 +167,10 @@ api.get(
           .insert(events)
           .values(watcherEvents)
           .onConflictDoNothing({
-            target: users.id,
+            target: [repositories.id, users.id],
             where: and(
               eq(events.eventName, "watch"),
               eq(events.eventAction, "started"),
-              eq(events.repoId, repoId),
             ),
           });
       }
