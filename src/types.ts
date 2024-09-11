@@ -11,7 +11,7 @@ type Variables = {
   db: Db;
   getRepositoriesWithEvents: GetRepositoriesWithEvents;
   fetchUserById: FetchUserById;
-  fetchUsersWithInteractions: FetchUsersWithInteractions;
+  fetchRepoWithUsersAndEvents: FetchRepoWithUsersAndEvents;
 };
 
 type EnvVars = {
@@ -40,7 +40,8 @@ export type RepositoriesWithEvents = Array<
 export type GetRepositoriesWithEvents = (
   id: schema.Repository["id"],
 ) => Promise<RepositoriesWithEvents>;
-export type FetchUsersWithInteractions = ({
+
+export type FetchRepoWithUsersAndEvents = ({
   owner,
   repo,
   count,
@@ -48,11 +49,15 @@ export type FetchUsersWithInteractions = ({
   owner: string;
   repo: string;
   count: number;
-}) => Promise<{
-  repoId: number;
-  stargazers: { users: Array<schema.UserInsert> };
-  watchers: { users: Array<schema.UserInsert> };
-}>;
+}) => Promise<
+  schema.RepositoryInsert & {
+    stargazers: { users: Array<schema.UserInsert> };
+    watchers: {
+      totalCount: number;
+      users: Array<schema.UserInsert>;
+    };
+  }
+>;
 
 // Octokit isn't exporting this particular type, so we extract it from the
 // `verifyAndReceive` method.

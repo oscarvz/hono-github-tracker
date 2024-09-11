@@ -36,6 +36,13 @@
       "when": 1724750517624,
       "tag": "0004_groovy_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1726057943054,
+      "tag": "0005_conscious_scarecrow",
+      "breakpoints": true
     }
   ]
 }
