@@ -2,8 +2,8 @@ import { Octokit } from "@octokit/core";
 import { createMiddleware } from "hono/factory";
 
 import type {
+  FetchRepoWithUsersAndEvents,
   FetchUserById,
-  FetchUsersWithInteractions,
   HonoEnv,
 } from "../types";
 
@@ -25,20 +25,23 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
   async (c, next) => {
     const githubToken = c.env.GITHUB_API_TOKEN;
     const octokit = getOctokitInstance(githubToken);
-
-    const fetchUsersWithInteractions: FetchUsersWithInteractions = async ({
+    const fetchRepoWithUsersAndEvents: FetchRepoWithUsersAndEvents = async ({
       owner,
       repo,
       count,
     }) => {
       try {
         const { repository } = await octokit.graphql<{
-          repository: ReturnType<FetchUsersWithInteractions>;
+          repository: ReturnType<FetchRepoWithUsersAndEvents>;
         }>(
           `
             query lastUsersWithInteractions($owner: String!, $repo: String!, $count: Int!) {
               repository(owner: $owner, name: $repo) {
-                repoId: databaseId,
+                id: databaseId,
+                fullName: nameWithOwner,
+                name,
+                description,
+                stargazerCount,
                 stargazers(last: $count) {
                   users: nodes {
                     id: databaseId,
@@ -52,6 +55,7 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
                   }
                 }
                 watchers(last: $count) {
+                  totalCount,
                   users: nodes {
                     id: databaseId,
                     avatar: avatarUrl,
@@ -87,7 +91,7 @@ export const githubApiMiddleware = createMiddleware<HonoEnv, "ghws">(
       }
     };
 
-    c.set("fetchUsersWithInteractions", fetchUsersWithInteractions);
+    c.set("fetchRepoWithUsersAndEvents", fetchRepoWithUsersAndEvents);
     c.set("fetchUserById", fetchUserById);
 
     await next();
