@@ -1,4 +1,3 @@
-import { and, eq } from "drizzle-orm";
 import { type Context, Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 
@@ -144,16 +143,7 @@ api.get(
         }),
       );
       if (stargazerEvents.length > 0) {
-        await db
-          .insert(events)
-          .values(stargazerEvents)
-          .onConflictDoNothing({
-            target: [repositories.id, users.id],
-            where: and(
-              eq(events.eventName, "star"),
-              eq(events.eventAction, "created"),
-            ),
-          });
+        await db.insert(events).values(stargazerEvents).onConflictDoNothing();
       }
 
       const watcherEvents: Array<EventInsert> = watchers.users.map((user) => ({
@@ -163,16 +153,7 @@ api.get(
         userId: user.id,
       }));
       if (watcherEvents.length > 0) {
-        await db
-          .insert(events)
-          .values(watcherEvents)
-          .onConflictDoNothing({
-            target: [repositories.id, users.id],
-            where: and(
-              eq(events.eventName, "watch"),
-              eq(events.eventAction, "started"),
-            ),
-          });
+        await db.insert(events).values(watcherEvents).onConflictDoNothing();
       }
 
       return c.text("Updated stargazers and watchers!");

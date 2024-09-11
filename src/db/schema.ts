@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const repositories = pgTable("repositories", {
   id: integer("id").primaryKey(),
@@ -24,21 +31,27 @@ export const users = pgTable("users", {
   twitterHandle: text("twitter_handle"),
 });
 
-export const events = pgTable("events", {
-  id: serial("id").primaryKey(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  repoId: integer("repo_id")
-    .notNull()
-    .references(() => repositories.id, {
-      onDelete: "cascade",
-    }),
-  eventId: integer("event_id"),
-  eventName: text("event_name").notNull(),
-  eventAction: text("event_action").notNull(),
-});
+export const events = pgTable(
+  "events",
+  {
+    id: serial("id").primaryKey(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    repoId: integer("repo_id")
+      .notNull()
+      .references(() => repositories.id, {
+        onDelete: "cascade",
+      }),
+    eventId: integer("event_id"),
+    eventName: text("event_name").notNull(),
+    eventAction: text("event_action").notNull(),
+  },
+  (t) => ({
+    uniqueEvent: unique().on(t.userId, t.repoId, t.eventName, t.eventAction),
+  }),
+);
 
 export const repositoriesEvents = relations(repositories, ({ many }) => ({
   events: many(events),
