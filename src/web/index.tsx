@@ -2,12 +2,13 @@ import { Hono } from "hono";
 
 import type { AdminDashboardProps, DashboardProps } from "../client";
 import { App } from "../client/App";
-import { reactRendererMiddleware } from "../middleware";
+import { jwtMiddleware, reactRendererMiddleware } from "../middleware";
 import type { HonoEnv, RepositoriesWithEvents } from "../types";
 
 const web = new Hono<HonoEnv>();
 
 web.use("*", reactRendererMiddleware);
+web.use("/admin/*", jwtMiddleware);
 
 web.get("/", async (c) => {
   const db = c.var.db;
@@ -24,7 +25,6 @@ web.get("/", async (c) => {
   });
 });
 
-// TODO: Add authentication middleware
 web.get("/admin", async (c) => {
   const db = c.var.db;
   const getRepositoriesWithEvents = c.var.getRepositoriesWithEvents;
@@ -56,6 +56,15 @@ web.get("/admin", async (c) => {
     clientComponent: {
       type: "adminDashboard",
       props,
+    },
+  });
+});
+
+web.get("/login", async (c) => {
+  return c.render(<App type="login" />, {
+    title: "Login",
+    clientComponent: {
+      type: "login",
     },
   });
 });

@@ -17,8 +17,9 @@ type Variables = {
 type EnvVars = {
   DATABASE_URL: string;
   GITHUB_API_TOKEN: string;
-  GITHUB_WEBHOOK_SECRET: string;
   GITHUB_BEARER_TOKEN: string;
+  GITHUB_WEBHOOK_SECRET: string;
+  JWT_SECRET: string;
 };
 
 export type HonoEnv = {

@@ -4,11 +4,10 @@ import { IconBrandGithub } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+import { getReposWithEvents } from "../rpc";
 import type { AdminDashboardProps } from "../types";
 import { EventsTable } from "./EventsTable";
 import { UsersTable } from "./UsersTable";
-import { REPOS } from "./constants";
-import { getReposWithEvents } from "./rpc";
 
 export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
   const [repoId, setRepoId] = useState(params?.repoId || repositories[0].id);
@@ -16,7 +15,7 @@ export function AdminDashboard({ repositories, params }: AdminDashboardProps) {
   const previousRepoId = usePrevious(repoId);
 
   const { data } = useQuery({
-    queryKey: [REPOS, repoId],
+    queryKey: ["repos", repoId],
     queryFn: getReposWithEvents(repoId?.toString()),
     initialData: { repositories },
     staleTime: (query) => {

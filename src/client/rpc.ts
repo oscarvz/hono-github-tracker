@@ -1,8 +1,29 @@
 import { type InferRequestType, hc } from "hono/client";
 
-import type { EventsApi, RepoApi } from "../../api";
-import type { Event } from "../../db";
-import type { AdminDashboardProps } from "../types";
+import type { EventsApi, LoginApi, RepoApi } from "../api";
+import type { Event } from "../db";
+import type { AdminDashboardProps } from "./types";
+
+const loginClient = hc<LoginApi>("/api/login");
+const loginAction = loginClient.index.$post;
+
+export async function login({
+  password,
+  userName,
+}: InferRequestType<typeof loginAction>["json"]) {
+  try {
+    const response = await loginClient.index.$post({
+      json: {
+        userName,
+        password,
+      },
+    });
+    const text = await response.text();
+    return text;
+  } catch (error) {
+    throw new Error(`Error logging in: ${error}`);
+  }
+}
 
 const repositoriesClient = hc<RepoApi>("/api/repositories");
 const repositoriesGetter = repositoriesClient[":id"].$get;

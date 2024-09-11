@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => {
     ssr: {
       external: [
         "@mantine/core",
+        "@mantine/form",
         "@mantine/hooks",
         "@tanstack/react-query",
         "react-dom",

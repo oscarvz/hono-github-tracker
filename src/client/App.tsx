@@ -1,10 +1,11 @@
 import { MantineProvider } from "@mantine/core";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@mantine/core/styles.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
 import { AdminDashboard } from "./AdminDashboard";
 import { Dashboard } from "./Dashboard";
+import { Login } from "./Login";
 import type { ClientComponent } from "./types";
 
 export function App(props: ClientComponent) {
@@ -25,11 +26,13 @@ export function App(props: ClientComponent) {
   );
 }
 
-function Component({ type, props }: ClientComponent) {
-  switch (type) {
+function Component(component: ClientComponent) {
+  switch (component.type) {
     case "dashboard":
-      return <Dashboard {...props} />;
+      return <Dashboard {...component.props} />;
     case "adminDashboard":
-      return <AdminDashboard {...props} />;
+      return <AdminDashboard {...component.props} />;
+    case "login":
+      return <Login />;
   }
 }

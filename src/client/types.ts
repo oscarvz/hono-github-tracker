@@ -17,6 +17,10 @@ export type AdminDashboardProps = {
   };
 };
 
+export type Login = {
+  type: "login";
+};
+
 export type Dashboard = {
   type: "dashboard";
   props: DashboardProps;
@@ -27,4 +31,4 @@ export type AdminDashboard = {
   props: AdminDashboardProps;
 };
 
-export type ClientComponent = Dashboard | AdminDashboard;
+export type ClientComponent = AdminDashboard | Dashboard | Login;
