@@ -62,16 +62,15 @@ api.post("/github/webhook", async (c) => {
         return c.text(`Error inserting user: ${error}`, 500);
       }
 
-      // Only issues have an event ID
-      let eventId: number | undefined;
-      if (name === "issues") {
-        eventId = payload.issue.id;
-      }
+      // Currently only issues have an event id.
+      const eventId = name === "issues" ? payload.issue.id : undefined;
+      // Forking a repo doesn't have an action
+      const eventAction = "action" in payload ? payload.action : undefined;
 
       try {
         await db.insert(events).values({
           eventId,
-          eventAction: payload.action,
+          eventAction,
           eventName: name,
           repoId: payload.repository.id,
           userId,
