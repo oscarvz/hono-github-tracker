@@ -43,6 +43,13 @@
       "when": 1726057943054,
       "tag": "0005_conscious_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1728398636911,
+      "tag": "0006_cute_doorman",
+      "breakpoints": true
     }
   ]
 }
