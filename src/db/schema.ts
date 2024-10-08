@@ -46,10 +46,10 @@ export const events = pgTable(
       }),
     eventId: integer("event_id"),
     eventName: text("event_name").notNull(),
-    eventAction: text("event_action").notNull(),
+    eventAction: text("event_action"),
   },
-  (t) => ({
-    uniqueEvent: unique().on(t.userId, t.repoId, t.eventName, t.eventAction),
+  ({ eventAction, eventName, repoId, userId }) => ({
+    uniqueEvent: unique().on(eventAction, eventName, repoId, userId),
   }),
 );
 
