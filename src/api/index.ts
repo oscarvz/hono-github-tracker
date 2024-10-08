@@ -16,7 +16,7 @@ api.post("/github/webhook", async (c) => {
   const fetchUserById = c.var.fetchUserById;
 
   webhooks.on(
-    ["issues.opened", "star.created", "watch.started"],
+    ["fork", "issues.opened", "star.created", "watch.started"],
     async ({ payload, name }) => {
       const userId = payload.sender.id;
 
